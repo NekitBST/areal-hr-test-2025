@@ -21,9 +21,11 @@
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@types/pg": "^8.11.11",
     "axios": "^1.8.4",
     "joi": "^17.13.3",
     "node-pg-migrate": "^7.9.1",
