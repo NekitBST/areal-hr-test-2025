@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
+import { UpdateOrganizationDto } from './dto/update-organization.dto';
 
 @Injectable()
 export class OrganizationsService {
@@ -56,6 +57,51 @@ export class OrganizationsService {
     const result = await this.dbService.query(
       'UPDATE organizations SET deleted = true, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
       [id]
+    );
+
+    return result.rows[0];
+  }
+
+  async update(id: number, updateOrganizationDto: UpdateOrganizationDto) {
+    const checkResult = await this.dbService.query(
+      'SELECT deleted FROM organizations WHERE id = $1',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      throw new NotFoundException(`Организация с ID ${id} не найдена`);
+    }
+
+    if (checkResult.rows[0].deleted) {
+      throw new BadRequestException(`Невозможно обновить удаленную организацию с ID ${id}`);
+    }
+
+    const updateFields: string[] = [];
+    const values: any[] = [];
+    let valueIndex = 1;
+
+    if (updateOrganizationDto.name !== undefined) {
+      updateFields.push(`name = $${valueIndex}`);
+      values.push(updateOrganizationDto.name);
+      valueIndex++;
+    }
+
+    if (updateOrganizationDto.comment !== undefined) {
+      updateFields.push(`comment = $${valueIndex}`);
+      values.push(updateOrganizationDto.comment);
+      valueIndex++;
+    }
+
+    if (updateFields.length === 0) {
+      return this.findOne(id);
+    }
+
+    updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+
+    const result = await this.dbService.query(
+      `UPDATE organizations SET ${updateFields.join(', ')} WHERE id = $${valueIndex} RETURNING id, name, comment, created_at, updated_at`,
+      values
     );
 
     return result.rows[0];
