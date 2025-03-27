@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 
@@ -19,5 +19,10 @@ export class OrganizationsController {
   @Post()
   async create(@Body() createOrganizationDto: CreateOrganizationDto) {
     return this.organizationsService.create(createOrganizationDto);
+  }
+
+  @Patch('delete/:id')
+  async softDelete(@Param('id') id: string) {
+    return this.organizationsService.softDelete(Number(id));
   }
 }
