@@ -1,6 +1,7 @@
 import { Module, Controller, Get } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseService } from './common/services/database.service';
+import { OrganizationsModule } from './modules/organizations/organizations.module';
 
 @Controller()
 export class AppController {
@@ -15,6 +16,7 @@ export class AppController {
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    OrganizationsModule,
   ],
   controllers: [AppController],
   providers: [DatabaseService],
