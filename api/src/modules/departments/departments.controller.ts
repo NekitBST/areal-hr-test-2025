@@ -12,9 +12,19 @@ export class DepartmentsController {
     return this.departmentsService.findAll();
   }
 
+  @Get('tree')
+  async findAllTree() {
+    return this.departmentsService.findAllTree();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.departmentsService.findOne(Number(id));
+  }
+
+  @Get(':id/tree')
+  async findOneWithTree(@Param('id') id: string) {
+    return this.departmentsService.findOneWithTree(Number(id));
   }
 
   @Get('organization/:organizationId')

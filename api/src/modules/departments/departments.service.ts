@@ -17,6 +17,18 @@ export class DepartmentsService {
     );
   }
 
+  async findAllTree() {
+    const result = await this.dbService.query(
+      'SELECT id, name, parent_id, organization_id, comment, created_at, updated_at, deleted, deleted_at FROM departments ORDER BY id'
+    );
+
+    const departments = result.rows.map(({ deleted, deleted_at, ...row }) =>
+      deleted ? { ...row, deleted_at } : row
+    );
+
+    return this.buildDepartmentTree(departments);
+  }
+
   async findOne(id: number) {
     const result = await this.dbService.query(
       'SELECT id, name, parent_id, organization_id, comment, created_at, updated_at, deleted, deleted_at FROM departments WHERE id = $1',
@@ -31,14 +43,42 @@ export class DepartmentsService {
     return deleted ? { ...row, deleted_at } : row;
   }
 
+  async findOneWithTree(id: number) {
+    const result = await this.dbService.query(
+      'SELECT id, name, parent_id, organization_id, comment, created_at, updated_at, deleted, deleted_at FROM departments WHERE id = $1 OR parent_id = $1 ORDER BY id',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      throw new NotFoundException(`Отдел с ID ${id} не найден`);
+    }
+
+    const departments = result.rows.map(({ deleted, deleted_at, ...row }) =>
+      deleted ? { ...row, deleted_at } : row
+    );
+
+    return this.buildDepartmentTree(departments)[0];
+  }
+
   async findByOrganization(organizationId: number) {
     const result = await this.dbService.query(
       'SELECT id, name, parent_id, organization_id, comment, created_at, updated_at, deleted, deleted_at FROM departments WHERE organization_id = $1 ORDER BY id',
       [organizationId]
     );
 
-    return result.rows.map(({ deleted, deleted_at, ...row }) =>
+    const departments = result.rows.map(({ deleted, deleted_at, ...row }) =>
       deleted ? { ...row, deleted_at } : row
     );
+
+    return this.buildDepartmentTree(departments);
+  }
+
+  private buildDepartmentTree(departments: any[], parentId: number | null = null): any[] {
+    return departments
+      .filter(dept => dept.parent_id === parentId)
+      .map(dept => ({
+        ...dept,
+        children: this.buildDepartmentTree(departments, dept.id)
+      }));
   }
 }
