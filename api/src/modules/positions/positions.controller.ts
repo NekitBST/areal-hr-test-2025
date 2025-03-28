@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common';
 import { PositionsService } from './positions.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 
@@ -19,5 +19,10 @@ export class PositionsController {
   @Post()
   async create(@Body() createPositionDto: CreatePositionDto) {
     return this.positionsService.create(createPositionDto);
+  }
+
+  @Patch('delete/:id')
+  async softDelete(@Param('id') id: string) {
+    return this.positionsService.softDelete(Number(id));
   }
 }

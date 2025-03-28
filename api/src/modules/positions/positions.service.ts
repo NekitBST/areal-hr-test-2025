@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '../../common/services/database.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 
@@ -36,6 +36,28 @@ export class PositionsService {
       'INSERT INTO positions (name) VALUES ($1) RETURNING id, name, created_at',
       [name]
     );
+    return result.rows[0];
+  }
+
+  async softDelete(id: number) {
+    const checkResult = await this.dbService.query(
+      'SELECT deleted FROM positions WHERE id = $1',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      throw new NotFoundException(`Должность с ID ${id} не найдена`);
+    }
+
+    if (checkResult.rows[0].deleted) {
+      throw new BadRequestException(`Должность с ID ${id} уже удалена`);
+    }
+
+    const result = await this.dbService.query(
+      'UPDATE positions SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+      [id]
+    );
+
     return result.rows[0];
   }
 }
