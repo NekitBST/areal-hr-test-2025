@@ -66,6 +66,10 @@ export class DepartmentsService {
       [organizationId]
     );
 
+    if (result.rows.length === 0) {
+      throw new NotFoundException(`Организация с ID ${organizationId} не найдена`);
+    }
+
     const departments = result.rows.map(({ deleted, deleted_at, ...row }) =>
       deleted ? { ...row, deleted_at } : row
     );
@@ -99,6 +103,64 @@ export class DepartmentsService {
     const result = await this.dbService.query(
       'UPDATE departments SET deleted = true, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
       [id]
+    );
+
+    return result.rows[0];
+  }
+
+  async update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
+    const checkResult = await this.dbService.query(
+      'SELECT deleted FROM departments WHERE id = $1',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      throw new NotFoundException(`Отдел с ID ${id} не найден`);
+    }
+
+    if (checkResult.rows[0].deleted) {
+      throw new BadRequestException(`Невозможно обновить удаленный отдел с ID ${id}`);
+    }
+
+    const { name, parent_id, organization_id, comment } = updateDepartmentDto;
+    const updateFields: string[] = [];
+    const values: (string | number | null)[] = [];
+    let paramCount = 1;
+
+    if (name !== undefined) {
+      updateFields.push(`name = $${paramCount}`);
+      values.push(name);
+      paramCount++;
+    }
+
+    if (parent_id !== undefined) {
+      updateFields.push(`parent_id = $${paramCount}`);
+      values.push(parent_id);
+      paramCount++;
+    }
+
+    if (organization_id !== undefined) {
+      updateFields.push(`organization_id = $${paramCount}`);
+      values.push(organization_id);
+      paramCount++;
+    }
+
+    if (comment !== undefined) {
+      updateFields.push(`comment = $${paramCount}`);
+      values.push(comment);
+      paramCount++;
+    }
+
+    if (updateFields.length === 0) {
+      return this.findOne(id);
+    }
+
+    updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(id);
+
+    const result = await this.dbService.query(
+      `UPDATE departments SET ${updateFields.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+      values
     );
 
     return result.rows[0];
