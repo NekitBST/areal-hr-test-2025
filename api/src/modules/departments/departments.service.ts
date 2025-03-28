@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -79,6 +79,28 @@ export class DepartmentsService {
       'INSERT INTO departments (name, parent_id, organization_id, comment) VALUES ($1, $2, $3, $4) RETURNING id, name, parent_id, organization_id, comment, created_at, updated_at',
       [name, parent_id || null, organization_id, comment || null]
     );
+    return result.rows[0];
+  }
+
+  async softDelete(id: number) {
+    const checkResult = await this.dbService.query(
+      'SELECT deleted FROM departments WHERE id = $1',
+      [id]
+    );
+
+    if (checkResult.rows.length === 0) {
+      throw new NotFoundException(`Отдел с ID ${id} не найден`);
+    }
+
+    if (checkResult.rows[0].deleted) {
+      throw new BadRequestException(`Отдел с ID ${id} уже удален`);
+    }
+
+    const result = await this.dbService.query(
+      'UPDATE departments SET deleted = true, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+      [id]
+    );
+
     return result.rows[0];
   }
 
