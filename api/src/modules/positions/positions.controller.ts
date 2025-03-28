@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { PositionsService } from './positions.service';
+import { CreatePositionDto } from './dto/create-position.dto';
 
 @Controller('positions')
 export class PositionsController {
@@ -13,5 +14,10 @@ export class PositionsController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.positionsService.findOne(Number(id));
+  }
+
+  @Post()
+  async create(@Body() createPositionDto: CreatePositionDto) {
+    return this.positionsService.create(createPositionDto);
   }
 }

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../../common/services/database.service';
+import { CreatePositionDto } from './dto/create-position.dto';
 
 @Injectable()
 export class PositionsService {
@@ -27,5 +28,14 @@ export class PositionsService {
 
     const { deleted, deleted_at, ...row } = result.rows[0];
     return deleted ? { ...row, deleted_at } : row;
+  }
+
+  async create(createPositionDto: CreatePositionDto) {
+    const { name } = createPositionDto;
+    const result = await this.dbService.query(
+      'INSERT INTO positions (name) VALUES ($1) RETURNING id, name, created_at',
+      [name]
+    );
+    return result.rows[0];
   }
 }
