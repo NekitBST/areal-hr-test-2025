@@ -73,6 +73,15 @@ export class DepartmentsService {
     return this.buildDepartmentTree(departments);
   }
 
+  async create(createDepartmentDto: CreateDepartmentDto) {
+    const { name, parent_id, organization_id, comment } = createDepartmentDto;
+    const result = await this.dbService.query(
+      'INSERT INTO departments (name, parent_id, organization_id, comment) VALUES ($1, $2, $3, $4) RETURNING id, name, parent_id, organization_id, comment, created_at, updated_at',
+      [name, parent_id || null, organization_id, comment || null]
+    );
+    return result.rows[0];
+  }
+
   private buildDepartmentTree(departments: any[], parentId: number | null = null): any[] {
     return departments
       .filter(dept => dept.parent_id === parentId)
