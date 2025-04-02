@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Put, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param } from '@nestjs/common';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -42,7 +42,7 @@ export class DepartmentsController {
     return this.departmentsService.update(Number(id), updateDepartmentDto);
   }
 
-  @Patch('delete/:id')
+  @Delete('delete/:id')
   async softDelete(@Param('id') id: string) {
     return this.departmentsService.softDelete(Number(id));
   }
