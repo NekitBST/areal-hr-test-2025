@@ -151,10 +151,6 @@ export class DepartmentsService {
       paramCount++;
     }
 
-    if (updateFields.length === 0) {
-      return this.findOne(id);
-    }
-
     updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
     values.push(id);
 

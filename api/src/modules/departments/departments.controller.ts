@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Delete, Put, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe } from '@nestjs/common';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
+import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
+import { createDepartmentSchema, updateDepartmentSchema } from './validation/department.schema';
 
 @Controller('departments')
 export class DepartmentsController {
@@ -18,32 +20,39 @@ export class DepartmentsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.departmentsService.findOne(Number(id));
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.departmentsService.findOne(id);
   }
 
   @Get(':id/tree')
-  async findOneWithTree(@Param('id') id: string) {
-    return this.departmentsService.findOneWithTree(Number(id));
+  async findOneWithTree(@Param('id', ParseIntPipe) id: number) {
+    return this.departmentsService.findOneWithTree(id);
   }
 
   @Get('organization/:organizationId')
-  async findByOrganization(@Param('organizationId') organizationId: string) {
-    return this.departmentsService.findByOrganization(Number(organizationId));
+  async findByOrganization(@Param('organizationId', ParseIntPipe) organizationId: number) {
+    return this.departmentsService.findByOrganization(organizationId);
   }
 
   @Post()
-  async create(@Body() createDepartmentDto: CreateDepartmentDto) {
+  async create(
+    @Body(new JoiValidationPipe(createDepartmentSchema))
+    createDepartmentDto: CreateDepartmentDto,
+  ) {
     return this.departmentsService.create(createDepartmentDto);
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateDepartmentDto: UpdateDepartmentDto) {
-    return this.departmentsService.update(Number(id), updateDepartmentDto);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new JoiValidationPipe(updateDepartmentSchema))
+    updateDepartmentDto: UpdateDepartmentDto,
+  ) {
+    return this.departmentsService.update(id, updateDepartmentDto);
   }
 
-  @Delete('delete/:id')
-  async softDelete(@Param('id') id: string) {
-    return this.departmentsService.softDelete(Number(id));
+  @Delete(':id')
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
+    return this.departmentsService.softDelete(id);
   }
 }
