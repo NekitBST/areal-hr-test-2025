@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Delete, Body, Param, Put } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
+import { createOrganizationSchema, updateOrganizationSchema } from './validation/organization.schema';
 
 @Controller('organizations')
 export class OrganizationsController {
@@ -13,22 +15,29 @@ export class OrganizationsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.organizationsService.findOne(Number(id));
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.organizationsService.findOne(id);
   }
 
   @Post()
-  async create(@Body() createOrganizationDto: CreateOrganizationDto) {
+  async create(
+    @Body(new JoiValidationPipe(createOrganizationSchema))
+    createOrganizationDto: CreateOrganizationDto,
+  ) {
     return this.organizationsService.create(createOrganizationDto);
   }
 
-  @Delete('delete/:id')
-  async softDelete(@Param('id') id: string) {
-    return this.organizationsService.softDelete(Number(id));
+  @Delete(':id')
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
+    return this.organizationsService.softDelete(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateOrganizationDto: UpdateOrganizationDto) {
-    return this.organizationsService.update(+id, updateOrganizationDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new JoiValidationPipe(updateOrganizationSchema))
+    updateOrganizationDto: UpdateOrganizationDto,
+  ) {
+    return this.organizationsService.update(id, updateOrganizationDto);
   }
 }
