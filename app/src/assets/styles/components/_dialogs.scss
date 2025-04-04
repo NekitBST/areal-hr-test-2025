@@ -1,0 +1,48 @@
+.p-dialog {
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+
+  .p-dialog-header {
+    background: #fff;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+
+    .p-dialog-title {
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: #1e293b;
+    }
+  }
+
+  .p-dialog-content {
+    background: #fff;
+    padding: 1.5rem;
+
+    .detail-item {
+      margin-bottom: 1rem;
+      display: flex;
+      
+      label {
+        font-weight: bold;
+        min-width: 120px;
+        margin-right: 1rem;
+        flex-shrink: 0;
+      }
+
+      span {
+        max-width: calc(100% - 150px);
+        word-wrap: break-word;
+      }
+    }
+  }
+
+  .p-dialog-footer {
+    background: #fff;
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+} 

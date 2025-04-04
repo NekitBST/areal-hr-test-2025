@@ -1,0 +1,28 @@
+.p-button {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &.p-button-text {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    &.p-button-danger:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    &.p-button-info:hover {
+      background: rgba(59, 130, 246, 0.1);
+    }
+  }
+
+  &.p-button-rounded {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+} 

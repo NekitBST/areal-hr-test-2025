@@ -1,0 +1,92 @@
+.p-datatable {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+
+  .p-datatable-header {
+    background: #fff;
+    padding: 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .p-datatable-thead > tr > th {
+    background: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+    padding: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: #f1f5f9;
+    }
+
+    .p-column-title {
+      font-size: 0.95rem;
+    }
+
+    &.p-sortable-column:hover {
+      background: #f1f5f9;
+    }
+
+    &.p-highlight {
+      background: #f1f5f9;
+      color: #2563eb;
+    }
+  }
+
+  .p-datatable-tbody > tr {
+    background: #fff;
+    transition: all 0.2s ease;
+
+    > td {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    &:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    &:hover {
+      background: #f1f5f9;
+    }
+
+    &.p-highlight {
+      background: #eff6ff;
+    }
+
+    &.deleted-row {
+      background-color: #fef2f2 !important;
+
+      &:hover {
+        background-color: #fee2e2 !important;
+      }
+
+      > td {
+        color: #991b1b;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .p-paginator {
+    background: #fff;
+    padding: 1rem;
+    border-top: 1px solid #e2e8f0;
+
+    .p-paginator-pages .p-paginator-page {
+      &.p-highlight {
+        background: #2563eb;
+        color: #fff;
+      }
+    }
+  }
+} 

@@ -1,0 +1,45 @@
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #475569;
+  }
+
+  .p-inputtext,
+  .p-textarea {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    resize: none;
+
+    &:hover {
+      border-color: #cbd5e1;
+    }
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    &.p-invalid {
+      border-color: #ef4444;
+      
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+      }
+    }
+  }
+
+  small.p-error {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.375rem;
+    display: block;
+  }
+} 
