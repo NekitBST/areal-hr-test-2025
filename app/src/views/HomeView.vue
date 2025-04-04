@@ -7,6 +7,11 @@
         <h3>Организации</h3>
         <p>Управление организациями</p>
       </router-link>
+      <router-link to="/positions" class="card">
+        <i class="pi pi-briefcase"></i>
+        <h3>Должности</h3>
+        <p>Управление должностями</p>
+      </router-link>
     </div>
   </div>
 </template> 
