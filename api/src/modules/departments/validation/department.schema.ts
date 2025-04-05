@@ -20,8 +20,8 @@ export const createDepartmentSchema = Joi.object({
   organization_id: Joi.number()
     .required()
     .messages({
-      'number.base': 'ID организации должно быть числом',
-      'any.required': 'ID организации обязательно для заполнения'
+      'number.base': 'ID организации не может быть пустым (выберите из списка)',
+      'any.required': 'ID организации обязательно для заполнения и должно быть числом'
     }),
   comment: Joi.string()
     .allow('')
@@ -48,7 +48,7 @@ export const updateDepartmentSchema = Joi.object({
     }),
   organization_id: Joi.number()
     .messages({
-      'number.base': 'ID организации должно быть числом'
+      'number.base': 'ID организации не может быть пустым (выберите из списка или оставьте выбранную)'
     }),
   comment: Joi.string()
     .allow('')

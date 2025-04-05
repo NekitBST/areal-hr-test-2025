@@ -127,7 +127,7 @@
           <label>Название:</label>
           <span>{{ organizationDetails.name }}</span>
         </div>
-        <div class="detail-item">
+        <div class="detail-item" v-if="organizationDetails.comment">
           <label>Комментарий:</label>
           <span>{{ organizationDetails.comment }}</span>
         </div>

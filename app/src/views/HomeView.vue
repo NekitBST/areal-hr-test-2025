@@ -12,6 +12,11 @@
         <h3>Должности</h3>
         <p>Управление должностями</p>
       </router-link>
+      <router-link to="/departments" class="card">
+        <i class="pi pi-sitemap"></i>
+        <h3>Отделы</h3>
+        <p>Управление отделами</p>
+      </router-link>
     </div>
   </div>
 </template> 
