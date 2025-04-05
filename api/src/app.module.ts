@@ -6,6 +6,7 @@ import { DepartmentsModule } from './modules/departments/departments.module';
 import { PositionsModule } from './modules/positions/positions.module';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { FilesModule } from './modules/files/files.module';
+import { HrOperationsModule } from './modules/hr-operations/hr-operations.module';
 
 @Controller()
 export class AppController {
@@ -24,7 +25,8 @@ export class AppController {
     DepartmentsModule,
     PositionsModule,
     EmployeesModule,
-    FilesModule
+    FilesModule,
+    HrOperationsModule
   ],
   controllers: [AppController],
   providers: [DatabaseService],
