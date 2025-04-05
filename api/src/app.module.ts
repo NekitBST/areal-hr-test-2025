@@ -4,6 +4,7 @@ import { DatabaseService } from './common/services/database.service';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
 import { PositionsModule } from './modules/positions/positions.module';
+import { EmployeesModule } from './modules/employees/employees.module';
 
 @Controller()
 export class AppController {
@@ -20,7 +21,8 @@ export class AppController {
     }),
     OrganizationsModule,
     DepartmentsModule,
-    PositionsModule
+    PositionsModule,
+    EmployeesModule
   ],
   controllers: [AppController],
   providers: [DatabaseService],
