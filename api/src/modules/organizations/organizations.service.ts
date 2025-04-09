@@ -9,17 +9,15 @@ export class OrganizationsService {
 
   async findAll() {
     const result = await this.dbService.query(
-      'SELECT id, name, comment, created_at, updated_at, deleted, deleted_at FROM organizations ORDER BY id'
+      'SELECT id, name, comment, created_at, updated_at FROM organizations WHERE deleted_at IS NULL ORDER BY id'
     );
 
-    return result.rows.map(({ deleted, deleted_at, ...row }) =>
-      deleted ? { ...row, deleted_at } : row
-    );
+    return result.rows;
   }
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      'SELECT id, name, comment, created_at, updated_at, deleted, deleted_at FROM organizations WHERE id = $1',
+      'SELECT id, name, comment, created_at, updated_at FROM organizations WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
 
@@ -27,8 +25,7 @@ export class OrganizationsService {
       throw new NotFoundException(`Организация с ID ${id} не найдена`);
     }
 
-    const { deleted, deleted_at, ...row } = result.rows[0];
-    return deleted ? { ...row, deleted_at } : row;
+    return result.rows[0];
   }
 
   async create(createOrganizationDto: CreateOrganizationDto) {
@@ -42,7 +39,7 @@ export class OrganizationsService {
 
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
-      'SELECT deleted FROM organizations WHERE id = $1',
+      'SELECT deleted_at FROM organizations WHERE id = $1',
       [id]
     );
 
@@ -50,12 +47,12 @@ export class OrganizationsService {
       throw new NotFoundException(`Организация с ID ${id} не найдена`);
     }
 
-    if (checkResult.rows[0].deleted) {
+    if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Организация с ID ${id} уже удалена`);
     }
 
     const result = await this.dbService.query(
-      'UPDATE organizations SET deleted = true, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+      'UPDATE organizations SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id, name, comment, created_at, updated_at, deleted_at',
       [id]
     );
 
@@ -64,7 +61,7 @@ export class OrganizationsService {
 
   async update(id: number, updateOrganizationDto: UpdateOrganizationDto) {
     const checkResult = await this.dbService.query(
-      'SELECT deleted FROM organizations WHERE id = $1',
+      'SELECT deleted_at FROM organizations WHERE id = $1',
       [id]
     );
 
@@ -72,7 +69,7 @@ export class OrganizationsService {
       throw new NotFoundException(`Организация с ID ${id} не найдена`);
     }
 
-    if (checkResult.rows[0].deleted) {
+    if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Невозможно обновить удаленную организацию с ID ${id}`);
     }
 
@@ -96,7 +93,7 @@ export class OrganizationsService {
     values.push(id);
 
     const result = await this.dbService.query(
-      `UPDATE organizations SET ${updateFields.join(', ')} WHERE id = $${valueIndex} RETURNING id, name, comment, created_at, updated_at`,
+      `UPDATE organizations SET ${updateFields.join(', ')} WHERE id = $${valueIndex} AND deleted_at IS NULL RETURNING id, name, comment, created_at, updated_at`,
       values
     );
 

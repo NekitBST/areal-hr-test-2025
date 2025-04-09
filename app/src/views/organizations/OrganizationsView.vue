@@ -15,7 +15,6 @@
       selectionMode="single"
       @row-select="onRowSelect"
       @row-unselect="onRowUnselect"
-      :rowClass="getRowClass"
     >
       <Column field="id" header="ID" sortable />
       <Column field="name" header="Название" sortable>
@@ -38,11 +37,6 @@
           {{ new Date(data.updated_at).toLocaleString() }}
         </template>
       </Column>
-      <Column field="deleted_at" header="Удалено" sortable>
-        <template #body="{ data }">
-          {{ data.deleted_at ? new Date(data.deleted_at).toLocaleString() : '' }}
-        </template>
-      </Column>
       <Column header="Действия">
         <template #body="{ data }">
           <div class="actions">
@@ -53,22 +47,20 @@
               severity="info"
               @click="viewDetails(data)"
             />
-            <template v-if="!data.deleted_at">
-              <Button
-                icon="pi pi-pencil"
-                text
-                rounded
-                severity="info"
-                @click="openEditDialog(data)"
-              />
-              <Button
-                icon="pi pi-trash"
-                text
-                rounded
-                severity="danger"
-                @click="confirmDelete(data)"
-              />
-            </template>
+            <Button
+              icon="pi pi-pencil"
+              text
+              rounded
+              severity="info"
+              @click="openEditDialog(data)"
+            />
+            <Button
+              icon="pi pi-trash"
+              text
+              rounded
+              severity="danger"
+              @click="confirmDelete(data)"
+            />
           </div>
         </template>
       </Column>
@@ -138,10 +130,6 @@
         <div class="detail-item">
           <label>Обновлено:</label>
           <span>{{ new Date(organizationDetails.updated_at).toLocaleString() }}</span>
-        </div>
-        <div class="detail-item" v-if="organizationDetails.deleted_at">
-          <label>Удалено:</label>
-          <span>{{ new Date(organizationDetails.deleted_at).toLocaleString() }}</span>
         </div>
       </div>
     </Dialog>
@@ -292,12 +280,6 @@ const onRowSelect = (event) => {
 
 const onRowUnselect = () => {
   store.setSelectedOrganization(null)
-}
-
-const getRowClass = (data) => {
-  return {
-    'deleted-row': data.deleted_at
-  }
 }
 
 const viewDetails = async (organization) => {

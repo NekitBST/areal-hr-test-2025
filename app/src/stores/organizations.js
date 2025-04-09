@@ -67,10 +67,10 @@ export const useOrganizationsStore = defineStore('organizations', {
     async deleteOrganization(id) {
       this.loading = true
       try {
-        const response = await organizationsApi.delete(id)
+        await organizationsApi.delete(id)
         const index = this.organizations.findIndex(org => org.id === id)
         if (index !== -1) {
-          this.organizations[index] = response.data
+          this.organizations.splice(index, 1)
         }
       } catch (error) {
         throw error

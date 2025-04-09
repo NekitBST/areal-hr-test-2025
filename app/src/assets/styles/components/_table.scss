@@ -58,18 +58,6 @@
     &.p-highlight {
       background: #eff6ff;
     }
-
-    &.deleted-row {
-      background-color: #fef2f2 !important;
-
-      &:hover {
-        background-color: #fee2e2 !important;
-      }
-
-      > td {
-        color: #991b1b;
-      }
-    }
   }
 
   .actions {
