@@ -67,10 +67,10 @@ export const usePositionsStore = defineStore('positions', {
     async deletePosition(id) {
       this.loading = true
       try {
-        const response = await positionsApi.delete(id)
+        await positionsApi.delete(id)
         const index = this.positions.findIndex(pos => pos.id === id)
         if (index !== -1) {
-          this.positions[index] = response.data
+          this.positions.splice(index, 1)
         }
       } catch (error) {
         throw error

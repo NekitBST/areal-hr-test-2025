@@ -9,17 +9,15 @@ export class PositionsService {
 
   async findAll() {
     const result = await this.dbService.query(
-      'SELECT id, name, created_at, updated_at, deleted, deleted_at FROM positions ORDER BY id'
+      'SELECT id, name, created_at, updated_at FROM positions WHERE deleted_at IS NULL ORDER BY id'
     );
 
-    return result.rows.map(({ deleted, deleted_at, ...row }) =>
-      deleted ? { ...row, deleted_at } : row
-    );
+    return result.rows;
   }
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      'SELECT id, name, created_at, updated_at, deleted, deleted_at FROM positions WHERE id = $1',
+      'SELECT id, name, created_at, updated_at FROM positions WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
 
@@ -27,8 +25,7 @@ export class PositionsService {
       throw new NotFoundException(`Должность с ID ${id} не найдена`);
     }
 
-    const { deleted, deleted_at, ...row } = result.rows[0];
-    return deleted ? { ...row, deleted_at } : row;
+    return result.rows[0];
   }
 
   async create(createPositionDto: CreatePositionDto) {
@@ -42,7 +39,7 @@ export class PositionsService {
 
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
-      'SELECT deleted FROM positions WHERE id = $1',
+      'SELECT deleted_at FROM positions WHERE id = $1',
       [id]
     );
 
@@ -50,12 +47,12 @@ export class PositionsService {
       throw new NotFoundException(`Должность с ID ${id} не найдена`);
     }
 
-    if (checkResult.rows[0].deleted) {
+    if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Должность с ID ${id} уже удалена`);
     }
 
     const result = await this.dbService.query(
-      'UPDATE positions SET deleted = true, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+      'UPDATE positions SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id, name, created_at, updated_at, deleted_at',
       [id]
     );
 
@@ -64,7 +61,7 @@ export class PositionsService {
 
   async update(id: number, updatePositionDto: UpdatePositionDto) {
     const checkResult = await this.dbService.query(
-      'SELECT deleted FROM positions WHERE id = $1',
+      'SELECT deleted_at FROM positions WHERE id = $1',
       [id]
     );
 
@@ -72,13 +69,13 @@ export class PositionsService {
       throw new NotFoundException(`Должность с ID ${id} не найдена`);
     }
 
-    if (checkResult.rows[0].deleted) {
+    if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Невозможно обновить удаленную должность с ID ${id}`);
     }
 
     const { name } = updatePositionDto;
     const result = await this.dbService.query(
-      'UPDATE positions SET name = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, name, created_at, updated_at',
+      'UPDATE positions SET name = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND deleted_at IS NULL RETURNING id, name, created_at, updated_at',
       [name, id]
     );
 
