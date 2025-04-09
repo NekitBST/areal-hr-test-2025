@@ -18,7 +18,6 @@ exports.up = pgm => {
     registration_house: { type: 'varchar(10)' },
     registration_building: { type: 'varchar(10)' },
     registration_apartment: { type: 'varchar(10)' },
-    deleted: { type: 'boolean', default: false },
     created_at: {
       type: 'timestamp',
       default: pgm.func('current_timestamp'),

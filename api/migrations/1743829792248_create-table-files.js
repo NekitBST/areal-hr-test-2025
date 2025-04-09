@@ -10,12 +10,11 @@ exports.up = pgm => {
       references: 'employees',
       onDelete: 'CASCADE'
     },
-    deleted: { type: 'boolean', default: false },
     created_at: {
       type: 'timestamp',
       default: pgm.func('current_timestamp'),
     },
-    update_at: {
+    updated_at: {
       type: 'timestamp',
       default: pgm.func('current_timestamp'),
     },

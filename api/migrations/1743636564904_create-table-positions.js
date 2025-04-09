@@ -4,7 +4,6 @@ exports.up = pgm => {
   pgm.createTable('positions', {
     id: 'id',
     name: { type: 'varchar(255)', notNull: true },
-    deleted: { type: 'boolean', default: false },
     created_at: {
       type: 'timestamp',
       default: pgm.func('current_timestamp'),

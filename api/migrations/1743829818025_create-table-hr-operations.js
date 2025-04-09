@@ -22,7 +22,6 @@ exports.up = pgm => {
     },
     salary: { type: 'decimal(10,0)' },
     action: { type: 'text', notNull: true },
-    deleted: { type: 'boolean', default: false },
     created_at: {
       type: 'timestamp',
       default: pgm.func('current_timestamp'),
