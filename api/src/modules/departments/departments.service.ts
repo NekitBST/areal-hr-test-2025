@@ -9,12 +9,10 @@ export class DepartmentsService {
 
   async findAll() {
     const result = await this.dbService.query(
-      'SELECT id, name, parent_id, organization_id, comment, created_at, updated_at, deleted, deleted_at FROM departments ORDER BY id'
+      'SELECT id, name, organization_id, parent_id, comment, created_at, updated_at FROM departments WHERE deleted_at IS NULL ORDER BY id'
     );
 
-    return result.rows.map(({ deleted, deleted_at, ...row }) =>
-      deleted ? { ...row, deleted_at } : row
-    );
+    return result.rows;
   }
 
   async findAllTree() {
@@ -31,7 +29,7 @@ export class DepartmentsService {
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      'SELECT id, name, parent_id, organization_id, comment, created_at, updated_at, deleted, deleted_at FROM departments WHERE id = $1',
+      'SELECT id, name, organization_id, parent_id, comment, created_at, updated_at FROM departments WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
 
@@ -39,8 +37,7 @@ export class DepartmentsService {
       throw new NotFoundException(`Отдел с ID ${id} не найден`);
     }
 
-    const { deleted, deleted_at, ...row } = result.rows[0];
-    return deleted ? { ...row, deleted_at } : row;
+    return result.rows[0];
   }
 
   async findOneWithTree(id: number) {
@@ -78,17 +75,19 @@ export class DepartmentsService {
   }
 
   async create(createDepartmentDto: CreateDepartmentDto) {
-    const { name, parent_id, organization_id, comment } = createDepartmentDto;
+    const { name, organization_id, parent_id, comment } = createDepartmentDto;
+
     const result = await this.dbService.query(
-      'INSERT INTO departments (name, parent_id, organization_id, comment) VALUES ($1, $2, $3, $4) RETURNING id, name, parent_id, organization_id, comment, created_at, updated_at',
-      [name, parent_id || null, organization_id, comment || null]
+      'INSERT INTO departments (name, organization_id, parent_id, comment) VALUES ($1, $2, $3, $4) RETURNING id, name, organization_id, parent_id, comment, created_at, updated_at',
+      [name, organization_id, parent_id || null, comment || null]
     );
+
     return result.rows[0];
   }
 
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
-      'SELECT deleted FROM departments WHERE id = $1',
+      'SELECT deleted_at FROM departments WHERE id = $1',
       [id]
     );
 
@@ -96,12 +95,12 @@ export class DepartmentsService {
       throw new NotFoundException(`Отдел с ID ${id} не найден`);
     }
 
-    if (checkResult.rows[0].deleted) {
+    if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Отдел с ID ${id} уже удален`);
     }
 
     const result = await this.dbService.query(
-      'UPDATE departments SET deleted = true, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *',
+      'UPDATE departments SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id, name, organization_id, parent_id, comment, created_at, updated_at, deleted_at',
       [id]
     );
 
@@ -110,7 +109,7 @@ export class DepartmentsService {
 
   async update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
     const checkResult = await this.dbService.query(
-      'SELECT deleted FROM departments WHERE id = $1',
+      'SELECT deleted_at FROM departments WHERE id = $1',
       [id]
     );
 
@@ -118,7 +117,7 @@ export class DepartmentsService {
       throw new NotFoundException(`Отдел с ID ${id} не найден`);
     }
 
-    if (checkResult.rows[0].deleted) {
+    if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Невозможно обновить удаленный отдел с ID ${id}`);
     }
 
@@ -155,7 +154,7 @@ export class DepartmentsService {
     values.push(id);
 
     const result = await this.dbService.query(
-      `UPDATE departments SET ${updateFields.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+      `UPDATE departments SET ${updateFields.join(', ')} WHERE id = $${paramCount} AND deleted_at IS NULL RETURNING id, name, organization_id, parent_id, comment, created_at, updated_at`,
       values
     );
 

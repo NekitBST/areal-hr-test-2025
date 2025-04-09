@@ -15,7 +15,6 @@
       selectionMode="single"
       @row-select="onRowSelect"
       @row-unselect="onRowUnselect"
-      :rowClass="getRowClass"
     >
       <Column field="id" header="ID" sortable />
       <Column field="name" header="Название" sortable>
@@ -38,11 +37,6 @@
           {{ new Date(data.updated_at).toLocaleString() }}
         </template>
       </Column>
-      <Column field="deleted_at" header="Удалено" sortable>
-        <template #body="{ data }">
-          {{ data.deleted_at ? new Date(data.deleted_at).toLocaleString() : '' }}
-        </template>
-      </Column>
       <Column header="Действия">
         <template #body="{ data }">
           <div class="actions">
@@ -53,22 +47,20 @@
               severity="info"
               @click="viewDetails(data)"
             />
-            <template v-if="!data.deleted_at">
-              <Button
-                icon="pi pi-pencil"
-                text
-                rounded
-                severity="info"
-                @click="openEditDialog(data)"
-              />
-              <Button
-                icon="pi pi-trash"
-                text
-                rounded
-                severity="danger"
-                @click="confirmDelete(data)"
-              />
-            </template>
+            <Button
+              icon="pi pi-pencil"
+              text
+              rounded
+              severity="info"
+              @click="openEditDialog(data)"
+            />
+            <Button
+              icon="pi pi-trash"
+              text
+              rounded
+              severity="danger"
+              @click="confirmDelete(data)"
+            />
           </div>
         </template>
       </Column>
@@ -189,10 +181,6 @@
           <label>Обновлено:</label>
           <span>{{ new Date(departmentDetails.updated_at).toLocaleString() }}</span>
         </div>
-        <div class="detail-item" v-if="departmentDetails.deleted_at">
-          <label>Удалено:</label>
-          <span>{{ new Date(departmentDetails.deleted_at).toLocaleString() }}</span>
-        </div>
       </div>
     </Dialog>
 
@@ -243,8 +231,8 @@ const loading = computed(() => store.loading)
 const detailsDialogVisible = ref(false)
 const departmentDetails = computed(() => store.departmentDetails)
 
-const activeOrganizations = computed(() => organizations.value.filter(org => !org.deleted_at))
-const activeDepartments = computed(() => departments.value.filter(dep => !dep.deleted_at))
+const activeOrganizations = computed(() => organizations.value)
+const activeDepartments = computed(() => departments.value.filter(dep => dep.id !== selectedDepartment.value?.id))
 
 const openCreateDialog = () => {
   dialogMode.value = 'create'
@@ -266,13 +254,13 @@ const openEditDialog = (department) => {
   clearErrors()
 
   const selectedOrg = organizations.value.find(org => org.id === department.organization_id)
-  if (selectedOrg?.deleted_at) {
+  if (!selectedOrg) {
     formErrors.organization_id = 'Выбранная организация была удалена. Выберите другую организацию'
   }
 
   if (department.parent_id) {
     const parentDep = departments.value.find(dep => dep.id === department.parent_id)
-    if (parentDep?.deleted_at) {
+    if (!parentDep) {
       formErrors.parent_id = 'Выбранный родительский отдел был удален. Выберите другой отдел'
     }
   }
@@ -336,16 +324,10 @@ const saveDepartment = async () => {
   try {
     clearErrors()
 
-    const selectedOrg = organizations.value.find(org => org.id === formData.organization_id)
-    if (selectedOrg?.deleted_at) {
-      formErrors.organization_id = 'Выбранная организация была удалена. Выберите другую организацию'
-      return
-    }
-
-    if (formData.parent_id) {
-      const parentDep = departments.value.find(dep => dep.id === formData.parent_id)
-      if (parentDep?.deleted_at) {
-        formErrors.parent_id = 'Выбранный родительский отдел был удален. Выберите другой отдел'
+    if (dialogMode.value === 'edit' && formData.organization_id) {
+      const selectedOrg = organizations.value.find(org => org.id === formData.organization_id)
+      if (!selectedOrg) {
+        formErrors.organization_id = 'Выбранная организация была удалена. Выберите другую организацию'
         return
       }
     }
@@ -401,12 +383,6 @@ const onRowSelect = (event) => {
 
 const onRowUnselect = () => {
   store.setSelectedDepartment(null)
-}
-
-const getRowClass = (data) => {
-  return {
-    'deleted-row': data.deleted_at
-  }
 }
 
 const getOrganizationName = (id) => {

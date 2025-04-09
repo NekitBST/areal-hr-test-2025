@@ -71,10 +71,9 @@ export const useDepartmentsStore = defineStore('departments', {
       try {
         this.loading = true
         await departmentsApi.delete(id)
-        const response = await departmentsApi.getById(id)
         const index = this.departments.findIndex(dep => dep.id === id)
         if (index !== -1) {
-          this.departments[index] = response.data
+          this.departments.splice(index, 1)
         }
       } catch (error) {
         throw error
