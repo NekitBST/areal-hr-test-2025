@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
+import { buildUpdateQuery } from '../../utils/db-update.utils';
 
 @Injectable()
 export class PositionsService {
@@ -73,10 +74,18 @@ export class PositionsService {
       throw new BadRequestException(`Невозможно обновить удаленную должность с ID ${id}`);
     }
 
-    const { name } = updatePositionDto;
+    const { updateFields, values, valueIndex } = buildUpdateQuery(updatePositionDto);
+
+    if (updateFields.length === 0) {
+      return this.findOne(id);
+    }
+
+    updateFields.push('updated_at = CURRENT_TIMESTAMP');
+    values.push(id);
+
     const result = await this.dbService.query(
-      'UPDATE positions SET name = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND deleted_at IS NULL RETURNING id, name, created_at, updated_at',
-      [name, id]
+      `UPDATE positions SET ${updateFields.join(', ')} WHERE id = $${valueIndex} AND deleted_at IS NULL RETURNING id, name, created_at, updated_at`,
+      values
     );
 
     return result.rows[0];

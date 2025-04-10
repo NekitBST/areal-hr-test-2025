@@ -5,114 +5,31 @@
       <Button label="Создать" icon="pi pi-plus" @click="openCreateDialog" />
     </div>
 
-    <DataTable
-      :value="positions"
+    <PositionsTable
+      :positions="positions"
       :loading="loading"
-      :paginator="true"
-      :rows="10"
-      stripedRows
-      v-model:selection="selectedPosition"
-      selectionMode="single"
+      v-model:selectedPosition="selectedPosition"
       @row-select="onRowSelect"
       @row-unselect="onRowUnselect"
-    >
-      <Column field="id" header="ID" sortable />
-      <Column field="name" header="Название" sortable>
-        <template #body="{ data }">
-          <span>{{ data.name.length > 15 ? data.name.slice(0, 15) + '...' : data.name }}</span>
-        </template>
-      </Column>
-      <Column field="created_at" header="Создано" sortable>
-        <template #body="{ data }">
-          {{ new Date(data.created_at).toLocaleString() }}
-        </template>
-      </Column>
-      <Column field="updated_at" header="Обновлено" sortable>
-        <template #body="{ data }">
-          {{ new Date(data.updated_at).toLocaleString() }}
-        </template>
-      </Column>
-      <Column header="Действия">
-        <template #body="{ data }">
-          <div class="actions">
-            <Button
-              icon="pi pi-eye"
-              text
-              rounded
-              severity="info"
-              @click="viewDetails(data)"
-            />
-            <Button
-              icon="pi pi-pencil"
-              text
-              rounded
-              severity="info"
-              @click="openEditDialog(data)"
-            />
-            <Button
-              icon="pi pi-trash"
-              text
-              rounded
-              severity="danger"
-              @click="confirmDelete(data)"
-            />
-          </div>
-        </template>
-      </Column>
-    </DataTable>
+      @view="viewDetails"
+      @edit="openEditDialog"
+      @delete="confirmDelete"
+    />
 
-    <Dialog
+    <PositionForm
       v-model:visible="dialogVisible"
-      :header="dialogMode === 'create' ? 'Создать должность' : 'Редактировать должность'"
-      modal
-      :style="{ width: '450px' }"
-    >
-      <div class="form-group">
-        <label for="name">Название*</label>
-        <InputText
-          id="name"
-          v-model="formData.name"
-          :class="{ 'p-invalid': formErrors.name }"
-        />
-        <small class="p-error">{{ formErrors.name }}</small>
-      </div>
+      :mode="dialogMode"
+      :loading="loading"
+      :position="selectedPosition"
+      :errors="formErrors"
+      @save="savePosition"
+      @cancel="closeDialog"
+    />
 
-      <template #footer>
-        <Button label="Отмена" icon="pi pi-times" text @click="closeDialog" />
-        <Button
-          label="Сохранить"
-          icon="pi pi-check"
-          @click="savePosition"
-          :loading="loading"
-        />
-      </template>
-    </Dialog>
-
-    <Dialog
+    <PositionDetails
       v-model:visible="detailsDialogVisible"
-      header="Детальная информация о должности"
-      modal
-      :style="{ width: '600px' }"
-    >
-      <div v-if="positionDetails" class="position-details">
-        <div class="detail-item">
-          <label>ID:</label>
-          <span>{{ positionDetails.id }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Название:</label>
-          <span>{{ positionDetails.name }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Создано:</label>
-          <span>{{ new Date(positionDetails.created_at).toLocaleString() }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Обновлено:</label>
-          <span>{{ new Date(positionDetails.updated_at).toLocaleString() }}</span>
-        </div>
-      </div>
-    </Dialog>
+      :position="positionDetails"
+    />
 
     <ConfirmDialog />
   </div>
@@ -123,13 +40,11 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import { usePositionsStore } from '../../stores/positions'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
 import Button from 'primevue/button'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
 import ConfirmDialog from 'primevue/confirmdialog'
+import PositionsTable from '../../components/positions/PositionsTable.vue'
+import PositionForm from '../../components/positions/PositionForm.vue'
+import PositionDetails from '../../components/positions/PositionDetails.vue'
 
 const store = usePositionsStore()
 const confirm = useConfirm()
@@ -138,9 +53,6 @@ const toast = useToast()
 const dialogVisible = ref(false)
 const dialogMode = ref('create')
 const selectedPosition = ref(null)
-const formData = reactive({
-  name: ''
-})
 const formErrors = reactive({
   name: ''
 })
@@ -152,7 +64,7 @@ const positionDetails = computed(() => store.positionDetails)
 
 const openCreateDialog = () => {
   dialogMode.value = 'create'
-  formData.name = ''
+  selectedPosition.value = null
   clearErrors()
   dialogVisible.value = true
 }
@@ -160,7 +72,6 @@ const openCreateDialog = () => {
 const openEditDialog = (position) => {
   dialogMode.value = 'edit'
   selectedPosition.value = position
-  formData.name = position.name
   clearErrors()
   dialogVisible.value = true
 }
@@ -205,7 +116,7 @@ const handleError = (error) => {
   showError(error)
 }
 
-const savePosition = async () => {
+const savePosition = async (formData) => {
   try {
     clearErrors()
     if (dialogMode.value === 'create') {
