@@ -14,24 +14,9 @@ export class DepartmentsController {
     return this.departmentsService.findAll();
   }
 
-  @Get('tree')
-  async findAllTree() {
-    return this.departmentsService.findAllTree();
-  }
-
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.departmentsService.findOne(id);
-  }
-
-  @Get(':id/tree')
-  async findOneWithTree(@Param('id', ParseIntPipe) id: number) {
-    return this.departmentsService.findOneWithTree(id);
-  }
-
-  @Get('organization/:organizationId')
-  async findByOrganization(@Param('organizationId', ParseIntPipe) organizationId: number) {
-    return this.departmentsService.findByOrganization(organizationId);
   }
 
   @Post()
