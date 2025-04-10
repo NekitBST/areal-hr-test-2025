@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { buildUpdateQuery } from '../../utils/db-update.utils';
 
 @Injectable()
 export class OrganizationsService {
@@ -73,23 +74,13 @@ export class OrganizationsService {
       throw new BadRequestException(`Невозможно обновить удаленную организацию с ID ${id}`);
     }
 
-    const updateFields: string[] = [];
-    const values: any[] = [];
-    let valueIndex = 1;
+    const { updateFields, values, valueIndex } = buildUpdateQuery(updateOrganizationDto);
 
-    if (updateOrganizationDto.name !== undefined) {
-      updateFields.push(`name = $${valueIndex}`);
-      values.push(updateOrganizationDto.name);
-      valueIndex++;
+    if (updateFields.length === 0) {
+      return this.findOne(id);
     }
 
-    if (updateOrganizationDto.comment !== undefined) {
-      updateFields.push(`comment = $${valueIndex}`);
-      values.push(updateOrganizationDto.comment);
-      valueIndex++;
-    }
-
-    updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
+    updateFields.push('updated_at = CURRENT_TIMESTAMP');
     values.push(id);
 
     const result = await this.dbService.query(

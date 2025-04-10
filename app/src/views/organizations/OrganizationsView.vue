@@ -5,134 +5,31 @@
       <Button label="Создать" icon="pi pi-plus" @click="openCreateDialog" />
     </div>
 
-    <DataTable
-      :value="organizations"
+    <OrganizationsTable
+      :organizations="organizations"
       :loading="loading"
-      :paginator="true"
-      :rows="10"
-      stripedRows
-      v-model:selection="selectedOrganization"
-      selectionMode="single"
+      v-model:selectedOrganization="selectedOrganization"
       @row-select="onRowSelect"
       @row-unselect="onRowUnselect"
-    >
-      <Column field="id" header="ID" sortable />
-      <Column field="name" header="Название" sortable>
-        <template #body="{ data }">
-          <span>{{ data.name.length > 15 ? data.name.slice(0, 15) + '...' : data.name }}</span>
-        </template>
-      </Column>
-      <Column field="comment" header="Комментарий">
-        <template #body="{ data }">
-          <span>{{ data.comment.length > 15 ? data.comment.slice(0, 15) + '...' : data.comment }}</span>
-        </template>
-      </Column>
-      <Column field="created_at" header="Создано" sortable>
-        <template #body="{ data }">
-          {{ new Date(data.created_at).toLocaleString() }}
-        </template>
-      </Column>
-      <Column field="updated_at" header="Обновлено" sortable>
-        <template #body="{ data }">
-          {{ new Date(data.updated_at).toLocaleString() }}
-        </template>
-      </Column>
-      <Column header="Действия">
-        <template #body="{ data }">
-          <div class="actions">
-            <Button
-              icon="pi pi-eye"
-              text
-              rounded
-              severity="info"
-              @click="viewDetails(data)"
-            />
-            <Button
-              icon="pi pi-pencil"
-              text
-              rounded
-              severity="info"
-              @click="openEditDialog(data)"
-            />
-            <Button
-              icon="pi pi-trash"
-              text
-              rounded
-              severity="danger"
-              @click="confirmDelete(data)"
-            />
-          </div>
-        </template>
-      </Column>
-    </DataTable>
+      @view="viewDetails"
+      @edit="openEditDialog"
+      @delete="confirmDelete"
+    />
 
-    <Dialog
+    <OrganizationForm
       v-model:visible="dialogVisible"
-      :header="dialogMode === 'create' ? 'Создать организацию' : 'Редактировать организацию'"
-      modal
-      :style="{ width: '450px' }"
-    >
-      <div class="form-group">
-        <label for="name">Название*</label>
-        <InputText
-          id="name"
-          v-model="formData.name"
-          :class="{ 'p-invalid': formErrors.name }"
-        />
-        <small class="p-error">{{ formErrors.name }}</small>
-      </div>
+      :mode="dialogMode"
+      :loading="loading"
+      :organization="selectedOrganization"
+      :errors="formErrors"
+      @save="saveOrganization"
+      @cancel="closeDialog"
+    />
 
-      <div class="form-group">
-        <label for="comment">Комментарий</label>
-        <Textarea
-          id="comment"
-          v-model="formData.comment"
-          rows="3"
-          :class="{ 'p-invalid': formErrors.comment }"
-        />
-        <small class="p-error">{{ formErrors.comment }}</small>
-      </div>
-
-      <template #footer>
-        <Button label="Отмена" icon="pi pi-times" text @click="closeDialog" />
-        <Button
-          label="Сохранить"
-          icon="pi pi-check"
-          @click="saveOrganization"
-          :loading="loading"
-        />
-      </template>
-    </Dialog>
-
-    <Dialog
+    <OrganizationDetails
       v-model:visible="detailsDialogVisible"
-      header="Детальная информация об организации"
-      modal
-      :style="{ width: '600px' }"
-    >
-      <div v-if="organizationDetails" class="organization-details">
-        <div class="detail-item">
-          <label>ID:</label>
-          <span>{{ organizationDetails.id }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Название:</label>
-          <span>{{ organizationDetails.name }}</span>
-        </div>
-        <div class="detail-item" v-if="organizationDetails.comment">
-          <label>Комментарий:</label>
-          <span>{{ organizationDetails.comment }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Создано:</label>
-          <span>{{ new Date(organizationDetails.created_at).toLocaleString() }}</span>
-        </div>
-        <div class="detail-item">
-          <label>Обновлено:</label>
-          <span>{{ new Date(organizationDetails.updated_at).toLocaleString() }}</span>
-        </div>
-      </div>
-    </Dialog>
+      :organization="organizationDetails"
+    />
 
     <ConfirmDialog />
   </div>
@@ -143,14 +40,11 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import { useOrganizationsStore } from '../../stores/organizations'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
 import Button from 'primevue/button'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
 import ConfirmDialog from 'primevue/confirmdialog'
+import OrganizationsTable from '../../components/organizations/OrganizationsTable.vue'
+import OrganizationForm from '../../components/organizations/OrganizationForm.vue'
+import OrganizationDetails from '../../components/organizations/OrganizationDetails.vue'
 
 const store = useOrganizationsStore()
 const confirm = useConfirm()
@@ -159,10 +53,6 @@ const toast = useToast()
 const dialogVisible = ref(false)
 const dialogMode = ref('create')
 const selectedOrganization = ref(null)
-const formData = reactive({
-  name: '',
-  comment: ''
-})
 const formErrors = reactive({
   name: '',
   comment: ''
@@ -175,8 +65,7 @@ const organizationDetails = computed(() => store.organizationDetails)
 
 const openCreateDialog = () => {
   dialogMode.value = 'create'
-  formData.name = ''
-  formData.comment = ''
+  selectedOrganization.value = null
   clearErrors()
   dialogVisible.value = true
 }
@@ -184,8 +73,6 @@ const openCreateDialog = () => {
 const openEditDialog = (organization) => {
   dialogMode.value = 'edit'
   selectedOrganization.value = organization
-  formData.name = organization.name
-  formData.comment = organization.comment || ''
   clearErrors()
   dialogVisible.value = true
 }
@@ -233,7 +120,7 @@ const handleError = (error) => {
   showError(error)
 }
 
-const saveOrganization = async () => {
+const saveOrganization = async (formData) => {
   try {
     clearErrors()
     if (dialogMode.value === 'create') {
