@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateHrOperationDto } from './dto/create-hr-operation.dto';
 import { UpdateHrOperationDto } from './dto/update-hr-operation.dto';
+import { buildUpdateQuery } from '../../utils/db-update.utils';
 
 @Injectable()
 export class HrOperationsService {
@@ -9,17 +10,17 @@ export class HrOperationsService {
 
   async findAll() {
     const result = await this.dbService.query(
-      `SELECT * FROM hr_operations ORDER BY id`
+      'SELECT id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at ' +
+      'FROM hr_operations WHERE deleted_at IS NULL ORDER BY id'
     );
 
-    return result.rows.map(({ deleted, deleted_at, ...row }) =>
-      deleted ? { ...row, deleted_at } : row
-    );
+    return result.rows;
   }
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      'SELECT * FROM hr_operations WHERE id = $1',
+      'SELECT id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at ' +
+      'FROM hr_operations WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
 
@@ -27,18 +28,16 @@ export class HrOperationsService {
       throw new NotFoundException(`Кадровая операция с ID ${id} не найдена`);
     }
 
-    const { deleted, deleted_at, ...row } = result.rows[0];
-    return deleted ? { ...row, deleted_at } : row;
+    return result.rows[0];
   }
 
   async create(createHrOperationDto: CreateHrOperationDto) {
     const { employee_id, department_id, position_id, salary, action } = createHrOperationDto;
     
     const result = await this.dbService.query(
-      `INSERT INTO hr_operations 
-        (employee_id, department_id, position_id, salary, action) 
-      VALUES ($1, $2, $3, $4, $5) 
-      RETURNING *`,
+      'INSERT INTO hr_operations (employee_id, department_id, position_id, salary, action) ' +
+      'VALUES ($1, $2, $3, $4, $5) ' +
+      'RETURNING id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at',
       [employee_id, department_id, position_id, salary, action]
     );
     
@@ -47,7 +46,7 @@ export class HrOperationsService {
 
   async update(id: number, updateHrOperationDto: UpdateHrOperationDto) {
     const checkResult = await this.dbService.query(
-      'SELECT deleted FROM hr_operations WHERE id = $1',
+      'SELECT deleted_at FROM hr_operations WHERE id = $1',
       [id]
     );
 
@@ -55,21 +54,11 @@ export class HrOperationsService {
       throw new NotFoundException(`Кадровая операция с ID ${id} не найдена`);
     }
 
-    if (checkResult.rows[0].deleted) {
+    if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Невозможно обновить удаленную кадровую операцию с ID ${id}`);
     }
 
-    const updateFields: string[] = [];
-    const values: any[] = [];
-    let valueIndex = 1;
-
-    Object.entries(updateHrOperationDto).forEach(([key, value]) => {
-      if (value !== undefined) {
-        updateFields.push(`${key} = $${valueIndex}`);
-        values.push(value);
-        valueIndex++;
-      }
-    });
+    const { updateFields, values, valueIndex } = buildUpdateQuery(updateHrOperationDto);
 
     if (updateFields.length === 0) {
       return this.findOne(id);
@@ -79,9 +68,9 @@ export class HrOperationsService {
     values.push(id);
 
     const result = await this.dbService.query(
-      `UPDATE hr_operations SET ${updateFields.join(', ')} 
-      WHERE id = $${valueIndex} 
-      RETURNING *`,
+      `UPDATE hr_operations SET ${updateFields.join(', ')} ` +
+      `WHERE id = $${valueIndex} AND deleted_at IS NULL ` +
+      'RETURNING id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at',
       values
     );
 
@@ -90,7 +79,7 @@ export class HrOperationsService {
 
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
-      'SELECT deleted FROM hr_operations WHERE id = $1',
+      'SELECT deleted_at FROM hr_operations WHERE id = $1',
       [id]
     );
 
@@ -98,15 +87,14 @@ export class HrOperationsService {
       throw new NotFoundException(`Кадровая операция с ID ${id} не найдена`);
     }
 
-    if (checkResult.rows[0].deleted) {
+    if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Кадровая операция с ID ${id} уже удалена`);
     }
 
     const result = await this.dbService.query(
-      `UPDATE hr_operations 
-      SET deleted = true, deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP 
-      WHERE id = $1 
-      RETURNING *`,
+      'UPDATE hr_operations SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP ' +
+      'WHERE id = $1 ' +
+      'RETURNING id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at, deleted_at',
       [id]
     );
 
