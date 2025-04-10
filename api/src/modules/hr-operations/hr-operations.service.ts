@@ -3,6 +3,7 @@ import { DatabaseService } from '../../common/services/database.service';
 import { CreateHrOperationDto } from './dto/create-hr-operation.dto';
 import { UpdateHrOperationDto } from './dto/update-hr-operation.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
+import { LogChanges } from '../../decorators/log-changes.decorator';
 
 @Injectable()
 export class HrOperationsService {
@@ -31,6 +32,7 @@ export class HrOperationsService {
     return result.rows[0];
   }
 
+  @LogChanges('hr-operation')
   async create(createHrOperationDto: CreateHrOperationDto) {
     const { employee_id, department_id, position_id, salary, action } = createHrOperationDto;
     
@@ -44,6 +46,7 @@ export class HrOperationsService {
     return result.rows[0];
   }
 
+  @LogChanges('hr-operation')
   async update(id: number, updateHrOperationDto: UpdateHrOperationDto) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM hr_operations WHERE id = $1',
@@ -77,6 +80,7 @@ export class HrOperationsService {
     return result.rows[0];
   }
 
+  @LogChanges('hr-operation')
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM hr_operations WHERE id = $1',

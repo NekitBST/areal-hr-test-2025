@@ -3,6 +3,7 @@ import { DatabaseService } from '../../common/services/database.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
+import { LogChanges } from '../../decorators/log-changes.decorator';
 
 @Injectable()
 export class PositionsService {
@@ -29,6 +30,7 @@ export class PositionsService {
     return result.rows[0];
   }
 
+  @LogChanges('position')
   async create(createPositionDto: CreatePositionDto) {
     const { name } = createPositionDto;
     const result = await this.dbService.query(
@@ -38,6 +40,7 @@ export class PositionsService {
     return result.rows[0];
   }
 
+  @LogChanges('position')
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM positions WHERE id = $1',
@@ -60,6 +63,7 @@ export class PositionsService {
     return result.rows[0];
   }
 
+  @LogChanges('position')
   async update(id: number, updatePositionDto: UpdatePositionDto) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM positions WHERE id = $1',

@@ -3,6 +3,7 @@ import { DatabaseService } from '../../common/services/database.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
+import { LogChanges } from '../../decorators/log-changes.decorator';
 
 @Injectable()
 export class DepartmentsService {
@@ -29,6 +30,7 @@ export class DepartmentsService {
     return result.rows[0];
   }
 
+  @LogChanges('department')
   async create(createDepartmentDto: CreateDepartmentDto) {
     const { name, organization_id, parent_id, comment } = createDepartmentDto;
 
@@ -40,6 +42,7 @@ export class DepartmentsService {
     return result.rows[0];
   }
 
+  @LogChanges('department')
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM departments WHERE id = $1',
@@ -62,6 +65,7 @@ export class DepartmentsService {
     return result.rows[0];
   }
 
+  @LogChanges('department')
   async update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM departments WHERE id = $1',

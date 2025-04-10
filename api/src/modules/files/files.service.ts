@@ -3,6 +3,7 @@ import { DatabaseService } from '../../common/services/database.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
+import { LogChanges } from '../../decorators/log-changes.decorator';
 
 @Injectable()
 export class FilesService {
@@ -29,6 +30,7 @@ export class FilesService {
     return result.rows[0];
   }
 
+  @LogChanges('file')
   async create(createFileDto: CreateFileDto) {
     const employeeExists = await this.dbService.query(
       'SELECT id FROM employees WHERE id = $1 AND deleted_at IS NULL',
@@ -48,6 +50,7 @@ export class FilesService {
     return result.rows[0];
   }
 
+  @LogChanges('file')
   async update(id: number, updateFileDto: UpdateFileDto) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM files WHERE id = $1',
@@ -90,6 +93,7 @@ export class FilesService {
     return result.rows[0];
   }
 
+  @LogChanges('file')
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM files WHERE id = $1',

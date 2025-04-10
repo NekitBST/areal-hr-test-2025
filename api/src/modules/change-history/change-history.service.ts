@@ -8,7 +8,7 @@ export class ChangeHistoryService {
 
   async findAll() {
     const result = await this.dbService.query(
-      `SELECT ch.*, u.last_name, u.first_name, u.middle_name 
+      `SELECT ch.*, u.last_name, u.first_name 
       FROM change_history ch
       LEFT JOIN users u ON ch.changed_by = u.id
       ORDER BY id`
@@ -18,7 +18,7 @@ export class ChangeHistoryService {
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      `SELECT ch.*, u.last_name, u.first_name, u.middle_name 
+      `SELECT ch.*, u.last_name, u.first_name 
       FROM change_history ch
       LEFT JOIN users u ON ch.changed_by = u.id
       WHERE ch.id = $1`,
@@ -29,11 +29,11 @@ export class ChangeHistoryService {
 
   async findByObjectType(objectType: string) {
     const result = await this.dbService.query(
-      `SELECT ch.*, u.last_name, u.first_name, u.middle_name 
+      `SELECT ch.*, u.last_name, u.first_name 
       FROM change_history ch
       LEFT JOIN users u ON ch.changed_by = u.id
       WHERE ch.object_type = $1
-      ORDER BY ch.operation_time DESC`,
+      ORDER BY id`,
       [objectType]
     );
     return result.rows;
@@ -41,11 +41,11 @@ export class ChangeHistoryService {
 
   async findByObjectId(objectType: string, objectId: number) {
     const result = await this.dbService.query(
-      `SELECT ch.*, u.last_name, u.first_name, u.middle_name 
+      `SELECT ch.*, u.last_name, u.first_name 
       FROM change_history ch
       LEFT JOIN users u ON ch.changed_by = u.id
       WHERE ch.object_type = $1 AND ch.object_id = $2
-      ORDER BY ch.operation_time DESC`,
+      ORDER BY id`,
       [objectType, objectId]
     );
     return result.rows;

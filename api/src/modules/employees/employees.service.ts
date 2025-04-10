@@ -3,6 +3,7 @@ import { DatabaseService } from '../../common/services/database.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
+import { LogChanges } from '../../decorators/log-changes.decorator';
 
 @Injectable()
 export class EmployeesService {
@@ -37,6 +38,7 @@ export class EmployeesService {
     return result.rows[0];
   }
 
+  @LogChanges('employee')
   async create(createEmployeeDto: CreateEmployeeDto) {
     const {
       last_name, first_name, middle_name, date_of_birth,
@@ -68,6 +70,7 @@ export class EmployeesService {
     return result.rows[0];
   }
 
+  @LogChanges('employee')
   async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM employees WHERE id = $1',
@@ -103,6 +106,7 @@ export class EmployeesService {
     return result.rows[0];
   }
 
+  @LogChanges('employee')
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM employees WHERE id = $1',
