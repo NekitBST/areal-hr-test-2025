@@ -41,7 +41,7 @@ export const createEmployeeSchema = Joi.object({
   
   passport_series: Joi.string()
     .allow('')
-    .max(20)
+    .max(4)
     .pattern(/^[0-9]*$/)
     .messages({
       'string.max': 'Серия паспорта не может быть длиннее {#limit} символов',
@@ -50,7 +50,7 @@ export const createEmployeeSchema = Joi.object({
   
   passport_number: Joi.string()
     .allow('')
-    .max(20)
+    .max(6)
     .pattern(/^[0-9]*$/)
     .messages({
       'string.max': 'Номер паспорта не может быть длиннее {#limit} символов',
@@ -159,7 +159,7 @@ export const updateEmployeeSchema = Joi.object({
   
   passport_series: Joi.string()
     .allow('')
-    .max(20)
+    .max(4)
     .pattern(/^[0-9]*$/)
     .messages({
       'string.max': 'Серия паспорта не может быть длиннее {#limit} символов',
@@ -168,7 +168,7 @@ export const updateEmployeeSchema = Joi.object({
   
   passport_number: Joi.string()
     .allow('')
-    .max(20)
+    .max(6)
     .pattern(/^[0-9]*$/)
     .messages({
       'string.max': 'Номер паспорта не может быть длиннее {#limit} символов',

@@ -17,6 +17,11 @@
         <h3>Отделы</h3>
         <p>Управление отделами</p>
       </router-link>
+      <router-link to="/employees" class="card">
+        <i class="pi pi-users"></i>
+        <h3>Сотрудники</h3>
+        <p>Управление сотрудниками</p>
+      </router-link>
     </div>
   </div>
 </template> 
