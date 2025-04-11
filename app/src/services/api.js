@@ -7,6 +7,13 @@ const api = axios.create({
   }
 })
 
+api.interceptors.request.use(config => {
+  if (config.data instanceof FormData) {
+    config.headers['Content-Type'] = 'multipart/form-data'
+  }
+  return config
+})
+
 export const organizationsApi = {
   getAll: () => api.get('/organizations'),
   getById: (id) => api.get(`/organizations/${id}`),
@@ -37,6 +44,14 @@ export const employeesApi = {
   create: (data) => api.post('/employees', data),
   update: (id, data) => api.put(`/employees/${id}`, data),
   delete: (id) => api.delete(`/employees/${id}`)
+}
+
+export const filesApi = {
+  getAll: () => api.get('/files'),
+  getById: (id) => api.get(`/files/${id}`),
+  create: (formData) => api.post('/files', formData),
+  update: (id, data) => api.put(`/files/${id}`, data),
+  delete: (id) => api.delete(`/files/${id}`)
 }
 
 export default api 

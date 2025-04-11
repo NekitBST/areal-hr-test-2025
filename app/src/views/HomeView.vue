@@ -22,6 +22,11 @@
         <h3>Сотрудники</h3>
         <p>Управление сотрудниками</p>
       </router-link>
+      <router-link to="/files" class="card">
+        <i class="pi pi-file"></i>
+        <h3>Файлы</h3>
+        <p>Управление файлами</p>
+      </router-link>
     </div>
   </div>
 </template> 
