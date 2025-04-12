@@ -62,4 +62,9 @@ export const hrOperationsApi = {
   delete: (id) => api.delete(`/hr-operations/${id}`)
 }
 
+export const changeHistoryApi = {
+  getAll: () => api.get('/change-history'),
+  getById: (id) => api.get(`/change-history/${id}`)
+}
+
 export default api 

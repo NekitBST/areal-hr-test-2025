@@ -32,6 +32,11 @@
         <h3>HR-операции</h3>
         <p>Управление HR-операциями</p>
       </router-link>
+      <router-link to="/change-history" class="card">
+        <i class="pi pi-history"></i>
+        <h3>История изменений</h3>
+        <p>История изменений</p>
+      </router-link>
     </div>
   </div>
 </template> 

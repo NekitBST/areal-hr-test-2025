@@ -12,6 +12,7 @@
       <router-link to="/employees" class="nav-link">Сотрудники</router-link>
       <router-link to="/files" class="nav-link">Файлы</router-link>
       <router-link to="/hr-operations" class="nav-link">HR-операции</router-link>
+      <router-link to="/change-history" class="nav-link">История изменений</router-link>
     </nav>
     <main class="main-content">
       <router-view></router-view>
