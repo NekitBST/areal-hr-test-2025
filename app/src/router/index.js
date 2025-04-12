@@ -32,6 +32,11 @@ const router = createRouter({
       path: '/files',
       name: 'files',
       component: () => import('../views/files/FilesView.vue')
+    },
+    {
+      path: '/hr-operations',
+      name: 'hr-operations',
+      component: () => import('../views/hr-operations/HROperationsView.vue')
     }
   ]
 })

@@ -32,7 +32,7 @@ export class HrOperationsService {
     return result.rows[0];
   }
 
-  @LogChanges('hr-operation')
+  @LogChanges('hr_operation')
   async create(createHrOperationDto: CreateHrOperationDto) {
     const { employee_id, department_id, position_id, salary, action } = createHrOperationDto;
     
@@ -46,7 +46,7 @@ export class HrOperationsService {
     return result.rows[0];
   }
 
-  @LogChanges('hr-operation')
+  @LogChanges('hr_operation')
   async update(id: number, updateHrOperationDto: UpdateHrOperationDto) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM hr_operations WHERE id = $1',
@@ -80,7 +80,7 @@ export class HrOperationsService {
     return result.rows[0];
   }
 
-  @LogChanges('hr-operation')
+  @LogChanges('hr_operation')
   async softDelete(id: number) {
     const checkResult = await this.dbService.query(
       'SELECT deleted_at FROM hr_operations WHERE id = $1',

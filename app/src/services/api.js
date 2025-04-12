@@ -54,4 +54,12 @@ export const filesApi = {
   delete: (id) => api.delete(`/files/${id}`)
 }
 
+export const hrOperationsApi = {
+  getAll: () => api.get('/hr-operations'),
+  getById: (id) => api.get(`/hr-operations/${id}`),
+  create: (data) => api.post('/hr-operations', data),
+  update: (id, data) => api.put(`/hr-operations/${id}`, data),
+  delete: (id) => api.delete(`/hr-operations/${id}`)
+}
+
 export default api 

@@ -27,6 +27,11 @@
         <h3>Файлы</h3>
         <p>Управление файлами</p>
       </router-link>
+      <router-link to="/hr-operations" class="card">
+        <i class="pi pi-cog"></i>
+        <h3>HR-операции</h3>
+        <p>Управление HR-операциями</p>
+      </router-link>
     </div>
   </div>
 </template> 
