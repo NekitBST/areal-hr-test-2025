@@ -4,10 +4,14 @@ import { CreateHrOperationDto } from './dto/create-hr-operation.dto';
 import { UpdateHrOperationDto } from './dto/update-hr-operation.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createHrOperationSchema, updateHrOperationSchema } from './validation/hr-operation.schema';
+import { DatabaseService } from '../../common/services/database.service';
 
 @Controller('hr-operations')
 export class HrOperationsController {
-  constructor(private readonly hrOperationsService: HrOperationsService) {}
+  constructor(
+    private readonly hrOperationsService: HrOperationsService,
+    private readonly dbService: DatabaseService
+  ) {}
 
   @Get()
   async findAll() {
@@ -24,7 +28,16 @@ export class HrOperationsController {
     @Body(new JoiValidationPipe(createHrOperationSchema))
     createHrOperationDto: CreateHrOperationDto,
   ) {
-    return this.hrOperationsService.create(createHrOperationDto);
+    return this.dbService.withTransaction(async (client) => {
+      return this.hrOperationsService.create(createHrOperationDto, client);
+    });
+  }
+
+  @Delete(':id')
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
+    return this.dbService.withTransaction(async (client) => {
+      return this.hrOperationsService.softDelete(id, client);
+    });
   }
 
   @Put(':id')
@@ -33,11 +46,8 @@ export class HrOperationsController {
     @Body(new JoiValidationPipe(updateHrOperationSchema))
     updateHrOperationDto: UpdateHrOperationDto,
   ) {
-    return this.hrOperationsService.update(id, updateHrOperationDto);
-  }
-
-  @Delete(':id')
-  async softDelete(@Param('id', ParseIntPipe) id: number) {
-    return this.hrOperationsService.softDelete(id);
+    return this.dbService.withTransaction(async (client) => {
+      return this.hrOperationsService.update(id, updateHrOperationDto, client);
+    });
   }
 } 

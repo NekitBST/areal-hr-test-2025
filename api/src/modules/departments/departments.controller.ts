@@ -4,10 +4,14 @@ import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createDepartmentSchema, updateDepartmentSchema } from './validation/department.schema';
+import { DatabaseService } from '../../common/services/database.service';
 
 @Controller('departments')
 export class DepartmentsController {
-  constructor(private readonly departmentsService: DepartmentsService) {}
+  constructor(
+    private readonly departmentsService: DepartmentsService,
+    private readonly dbService: DatabaseService
+  ) {}
 
   @Get()
   async findAll() {
@@ -24,7 +28,16 @@ export class DepartmentsController {
     @Body(new JoiValidationPipe(createDepartmentSchema))
     createDepartmentDto: CreateDepartmentDto,
   ) {
-    return this.departmentsService.create(createDepartmentDto);
+    return this.dbService.withTransaction(async (client) => {
+      return this.departmentsService.create(createDepartmentDto, client);
+    });
+  }
+
+  @Delete(':id')
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
+    return this.dbService.withTransaction(async (client) => {
+      return this.departmentsService.softDelete(id, client);
+    });
   }
 
   @Put(':id')
@@ -33,11 +46,8 @@ export class DepartmentsController {
     @Body(new JoiValidationPipe(updateDepartmentSchema))
     updateDepartmentDto: UpdateDepartmentDto,
   ) {
-    return this.departmentsService.update(id, updateDepartmentDto);
-  }
-
-  @Delete(':id')
-  async softDelete(@Param('id', ParseIntPipe) id: number) {
-    return this.departmentsService.softDelete(id);
+    return this.dbService.withTransaction(async (client) => {
+      return this.departmentsService.update(id, updateDepartmentDto, client);
+    });
   }
 }

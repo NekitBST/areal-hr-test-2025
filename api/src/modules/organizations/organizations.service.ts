@@ -4,6 +4,7 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
+import { PoolClient } from 'pg';
 
 @Injectable()
 export class OrganizationsService {
@@ -11,7 +12,8 @@ export class OrganizationsService {
 
   async findAll() {
     const result = await this.dbService.query(
-      'SELECT id, name, comment, created_at, updated_at FROM organizations WHERE deleted_at IS NULL ORDER BY id'
+      'SELECT id, name, comment, created_at, updated_at ' +
+      'FROM organizations WHERE deleted_at IS NULL ORDER BY id'
     );
 
     return result.rows;
@@ -19,7 +21,8 @@ export class OrganizationsService {
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      'SELECT id, name, comment, created_at, updated_at FROM organizations WHERE id = $1 AND deleted_at IS NULL',
+      'SELECT id, name, comment, created_at, updated_at ' +
+      'FROM organizations WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
 
@@ -31,18 +34,20 @@ export class OrganizationsService {
   }
 
   @LogChanges('organization')
-  async create(createOrganizationDto: CreateOrganizationDto) {
+  async create(createOrganizationDto: CreateOrganizationDto, client?: PoolClient) {
     const { name, comment } = createOrganizationDto;
-    const result = await this.dbService.query(
-      'INSERT INTO organizations (name, comment) VALUES ($1, $2) RETURNING id, name, comment, created_at, updated_at',
+    const result = await (client || this.dbService).query(
+      'INSERT INTO organizations (name, comment) ' +
+      'VALUES ($1, $2) ' +
+      'RETURNING id, name, comment, created_at, updated_at',
       [name, comment]
     );
     return result.rows[0];
   }
 
   @LogChanges('organization')
-  async softDelete(id: number) {
-    const checkResult = await this.dbService.query(
+  async softDelete(id: number, client?: PoolClient) {
+    const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM organizations WHERE id = $1',
       [id]
     );
@@ -55,8 +60,10 @@ export class OrganizationsService {
       throw new BadRequestException(`Организация с ID ${id} уже удалена`);
     }
 
-    const result = await this.dbService.query(
-      'UPDATE organizations SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id, name, comment, created_at, updated_at, deleted_at',
+    const result = await (client || this.dbService).query(
+      'UPDATE organizations SET deleted_at = CURRENT_TIMESTAMP ' +
+      'WHERE id = $1 AND deleted_at IS NULL ' +
+      'RETURNING id, name, comment, created_at, updated_at, deleted_at',
       [id]
     );
 
@@ -64,8 +71,8 @@ export class OrganizationsService {
   }
 
   @LogChanges('organization')
-  async update(id: number, updateOrganizationDto: UpdateOrganizationDto) {
-    const checkResult = await this.dbService.query(
+  async update(id: number, updateOrganizationDto: UpdateOrganizationDto, client?: PoolClient) {
+    const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM organizations WHERE id = $1',
       [id]
     );
@@ -87,8 +94,10 @@ export class OrganizationsService {
     updateFields.push('updated_at = CURRENT_TIMESTAMP');
     values.push(id);
 
-    const result = await this.dbService.query(
-      `UPDATE organizations SET ${updateFields.join(', ')} WHERE id = $${valueIndex} AND deleted_at IS NULL RETURNING id, name, comment, created_at, updated_at`,
+    const result = await (client || this.dbService).query(
+      `UPDATE organizations SET ${updateFields.join(', ')} ` +
+      `WHERE id = $${valueIndex} AND deleted_at IS NULL ` +
+      'RETURNING id, name, comment, created_at, updated_at',
       values
     );
 

@@ -4,10 +4,14 @@ import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createPositionSchema, updatePositionSchema } from './validation/position.schema';
+import { DatabaseService } from '../../common/services/database.service';
 
 @Controller('positions')
 export class PositionsController {
-  constructor(private readonly positionsService: PositionsService) {}
+  constructor(
+    private readonly positionsService: PositionsService,
+    private readonly dbService: DatabaseService
+  ) {}
 
   @Get()
   async findAll() {
@@ -24,12 +28,16 @@ export class PositionsController {
     @Body(new JoiValidationPipe(createPositionSchema))
     createPositionDto: CreatePositionDto,
   ) {
-    return this.positionsService.create(createPositionDto);
+    return this.dbService.withTransaction(async (client) => {
+      return this.positionsService.create(createPositionDto, client);
+    });
   }
 
   @Delete(':id')
   async softDelete(@Param('id', ParseIntPipe) id: number) {
-    return this.positionsService.softDelete(id);
+    return this.dbService.withTransaction(async (client) => {
+      return this.positionsService.softDelete(id, client);
+    });
   }
 
   @Put(':id')
@@ -38,6 +46,8 @@ export class PositionsController {
     @Body(new JoiValidationPipe(updatePositionSchema))
     updatePositionDto: UpdatePositionDto,
   ) {
-    return this.positionsService.update(id, updatePositionDto);
+    return this.dbService.withTransaction(async (client) => {
+      return this.positionsService.update(id, updatePositionDto, client);
+    });
   }
 }

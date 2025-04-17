@@ -4,10 +4,14 @@ import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createOrganizationSchema, updateOrganizationSchema } from './validation/organization.schema';
+import { DatabaseService } from '../../common/services/database.service';
 
 @Controller('organizations')
 export class OrganizationsController {
-  constructor(private readonly organizationsService: OrganizationsService) {}
+  constructor(
+    private readonly organizationsService: OrganizationsService,
+    private readonly dbService: DatabaseService
+  ) {}
 
   @Get()
   async findAll() {
@@ -24,20 +28,26 @@ export class OrganizationsController {
     @Body(new JoiValidationPipe(createOrganizationSchema))
     createOrganizationDto: CreateOrganizationDto,
   ) {
-    return this.organizationsService.create(createOrganizationDto);
+    return this.dbService.withTransaction(async (client) => {
+      return this.organizationsService.create(createOrganizationDto, client);
+    });
   }
 
   @Delete(':id')
   async softDelete(@Param('id', ParseIntPipe) id: number) {
-    return this.organizationsService.softDelete(id);
+    return this.dbService.withTransaction(async (client) => {
+      return this.organizationsService.softDelete(id, client);
+    });
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(updateOrganizationSchema))
     updateOrganizationDto: UpdateOrganizationDto,
   ) {
-    return this.organizationsService.update(id, updateOrganizationDto);
+    return this.dbService.withTransaction(async (client) => {
+      return this.organizationsService.update(id, updateOrganizationDto, client);
+    });
   }
 }

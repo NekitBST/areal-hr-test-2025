@@ -7,10 +7,14 @@ import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createFileSchema, updateFileSchema } from './validation/file.schema';
+import { DatabaseService } from '../../common/services/database.service';
 
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(
+    private readonly filesService: FilesService,
+    private readonly dbService: DatabaseService
+  ) {}
 
   @Get()
   async findAll() {
@@ -43,7 +47,9 @@ export class FilesController {
     @Body(new JoiValidationPipe(createFileSchema)) createFileDto: CreateFileDto,
   ) {
     createFileDto.file_path = file.path.replace(/\\/g, '/');
-    return this.filesService.create(createFileDto);
+    return this.dbService.withTransaction(async (client) => {
+      return this.filesService.create(createFileDto, client);
+    });
   }
 
   @Put(':id')
@@ -70,11 +76,15 @@ export class FilesController {
     if (file) {
       updateFileDto.file_path = file.path.replace(/\\/g, '/');
     }
-    return this.filesService.update(id, updateFileDto);
+    return this.dbService.withTransaction(async (client) => {
+      return this.filesService.update(id, updateFileDto, client);
+    });
   }
 
   @Delete(':id')
   async softDelete(@Param('id', ParseIntPipe) id: number) {
-    return this.filesService.softDelete(id);
+    return this.dbService.withTransaction(async (client) => {
+      return this.filesService.softDelete(id, client);
+    });
   }
 } 
