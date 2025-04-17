@@ -4,6 +4,7 @@ import { CreateHrOperationDto } from './dto/create-hr-operation.dto';
 import { UpdateHrOperationDto } from './dto/update-hr-operation.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
+import { PoolClient } from 'pg';
 
 @Injectable()
 export class HrOperationsService {
@@ -33,10 +34,10 @@ export class HrOperationsService {
   }
 
   @LogChanges('hr_operation')
-  async create(createHrOperationDto: CreateHrOperationDto) {
+  async create(createHrOperationDto: CreateHrOperationDto, client?: PoolClient) {
     const { employee_id, department_id, position_id, salary, action } = createHrOperationDto;
     
-    const result = await this.dbService.query(
+    const result = await (client || this.dbService).query(
       'INSERT INTO hr_operations (employee_id, department_id, position_id, salary, action) ' +
       'VALUES ($1, $2, $3, $4, $5) ' +
       'RETURNING id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at',
@@ -47,8 +48,8 @@ export class HrOperationsService {
   }
 
   @LogChanges('hr_operation')
-  async update(id: number, updateHrOperationDto: UpdateHrOperationDto) {
-    const checkResult = await this.dbService.query(
+  async update(id: number, updateHrOperationDto: UpdateHrOperationDto, client?: PoolClient) {
+    const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM hr_operations WHERE id = $1',
       [id]
     );
@@ -70,7 +71,7 @@ export class HrOperationsService {
     updateFields.push('updated_at = CURRENT_TIMESTAMP');
     values.push(id);
 
-    const result = await this.dbService.query(
+    const result = await (client || this.dbService).query(
       `UPDATE hr_operations SET ${updateFields.join(', ')} ` +
       `WHERE id = $${valueIndex} AND deleted_at IS NULL ` +
       'RETURNING id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at',
@@ -81,8 +82,8 @@ export class HrOperationsService {
   }
 
   @LogChanges('hr_operation')
-  async softDelete(id: number) {
-    const checkResult = await this.dbService.query(
+  async softDelete(id: number, client?: PoolClient) {
+    const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM hr_operations WHERE id = $1',
       [id]
     );
@@ -95,9 +96,9 @@ export class HrOperationsService {
       throw new BadRequestException(`Кадровая операция с ID ${id} уже удалена`);
     }
 
-    const result = await this.dbService.query(
-      'UPDATE hr_operations SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP ' +
-      'WHERE id = $1 ' +
+    const result = await (client || this.dbService).query(
+      'UPDATE hr_operations SET deleted_at = CURRENT_TIMESTAMP ' +
+      'WHERE id = $1 AND deleted_at IS NULL ' +
       'RETURNING id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at, deleted_at',
       [id]
     );

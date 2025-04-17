@@ -4,6 +4,7 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
+import { PoolClient } from 'pg';
 
 @Injectable()
 export class EmployeesService {
@@ -11,10 +12,10 @@ export class EmployeesService {
 
   async findAll() {
     const result = await this.dbService.query(
-      'SELECT id, last_name, first_name, middle_name, date_of_birth, passport_series, ' +
-      'passport_number, passport_issue_date, passport_department_code, passport_issued_by, ' +
-      'registration_area, registration_city, registration_street, registration_house, ' +
-      'registration_building, registration_apartment, created_at, updated_at ' +
+      'SELECT id, last_name, first_name, middle_name, date_of_birth, ' +
+      'passport_series, passport_number, passport_issue_date, passport_department_code, ' +
+      'passport_issued_by, registration_area, registration_city, registration_street, ' +
+      'registration_house, registration_building, registration_apartment, created_at, updated_at ' +
       'FROM employees WHERE deleted_at IS NULL ORDER BY id'
     );
 
@@ -23,10 +24,10 @@ export class EmployeesService {
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      'SELECT id, last_name, first_name, middle_name, date_of_birth, passport_series, ' +
-      'passport_number, passport_issue_date, passport_department_code, passport_issued_by, ' +
-      'registration_area, registration_city, registration_street, registration_house, ' +
-      'registration_building, registration_apartment, created_at, updated_at ' +
+      'SELECT id, last_name, first_name, middle_name, date_of_birth, ' +
+      'passport_series, passport_number, passport_issue_date, passport_department_code, ' +
+      'passport_issued_by, registration_area, registration_city, registration_street, ' +
+      'registration_house, registration_building, registration_apartment, created_at, updated_at ' +
       'FROM employees WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
@@ -39,7 +40,7 @@ export class EmployeesService {
   }
 
   @LogChanges('employee')
-  async create(createEmployeeDto: CreateEmployeeDto) {
+  async create(createEmployeeDto: CreateEmployeeDto, client?: PoolClient) {
     const {
       last_name, first_name, middle_name, date_of_birth,
       passport_series, passport_number, passport_issue_date,
@@ -48,7 +49,7 @@ export class EmployeesService {
       registration_house, registration_building, registration_apartment
     } = createEmployeeDto;
 
-    const result = await this.dbService.query(
+    const result = await (client || this.dbService).query(
       'INSERT INTO employees (last_name, first_name, middle_name, date_of_birth, ' +
       'passport_series, passport_number, passport_issue_date, passport_department_code, ' +
       'passport_issued_by, registration_area, registration_city, registration_street, ' +
@@ -71,8 +72,8 @@ export class EmployeesService {
   }
 
   @LogChanges('employee')
-  async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
-    const checkResult = await this.dbService.query(
+  async update(id: number, updateEmployeeDto: UpdateEmployeeDto, client?: PoolClient) {
+    const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM employees WHERE id = $1',
       [id]
     );
@@ -94,7 +95,7 @@ export class EmployeesService {
     updateFields.push('updated_at = CURRENT_TIMESTAMP');
     values.push(id);
 
-    const result = await this.dbService.query(
+    const result = await (client || this.dbService).query(
       `UPDATE employees SET ${updateFields.join(', ')} WHERE id = $${valueIndex} AND deleted_at IS NULL ` +
       'RETURNING id, last_name, first_name, middle_name, date_of_birth, passport_series, ' +
       'passport_number, passport_issue_date, passport_department_code, passport_issued_by, ' +
@@ -107,8 +108,8 @@ export class EmployeesService {
   }
 
   @LogChanges('employee')
-  async softDelete(id: number) {
-    const checkResult = await this.dbService.query(
+  async softDelete(id: number, client?: PoolClient) {
+    const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM employees WHERE id = $1',
       [id]
     );
@@ -121,8 +122,9 @@ export class EmployeesService {
       throw new BadRequestException(`Сотрудник с ID ${id} уже удален`);
     }
 
-    const result = await this.dbService.query(
-      'UPDATE employees SET deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = $1 ' +
+    const result = await (client || this.dbService).query(
+      'UPDATE employees SET deleted_at = CURRENT_TIMESTAMP ' +
+      'WHERE id = $1 AND deleted_at IS NULL ' +
       'RETURNING id, last_name, first_name, middle_name, date_of_birth, passport_series, ' +
       'passport_number, passport_issue_date, passport_department_code, passport_issued_by, ' +
       'registration_area, registration_city, registration_street, registration_house, ' +
