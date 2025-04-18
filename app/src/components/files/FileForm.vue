@@ -6,36 +6,25 @@
     modal
     :style="{ width: '450px' }"
   >
-    <div class="form-group">
-      <label for="name">Название*</label>
-      <InputText
-        id="name"
-        v-model="formData.name"
-        :class="{ 'p-invalid': errors?.name }"
-      />
-      <small class="p-error">{{ errors?.name }}</small>
-    </div>
+    <UIInput
+      id="name"
+      v-model="formData.name"
+      label="Название"
+      :error="errors?.name"
+      required
+    />
 
-    <div class="form-group">
-      <label for="employee">Сотрудник*</label>
-      <div class="p-inputgroup">
-        <Dropdown
-          id="employee"
-          v-model="formData.employee_id"
-          :options="employees"
-          optionLabel="full_name"
-          optionValue="id"
-          placeholder="Выберите сотрудника"
-          :class="{ 'p-invalid': errors?.employee_id }"
-        />
-        <Button
-          icon="pi pi-times"
-          @click="formData.employee_id = null"
-          :disabled="!formData.employee_id"
-        />
-      </div>
-      <small class="p-error">{{ errors?.employee_id }}</small>
-    </div>
+    <UIDropdown
+      id="employee"
+      v-model="formData.employee_id"
+      :options="employees"
+      optionLabel="full_name"
+      optionValue="id"
+      label="Сотрудник"
+      placeholder="Выберите сотрудника"
+      :error="errors?.employee_id"
+      required
+    />
 
     <div class="form-group">
       <label for="file">Файл{{ mode === 'create' ? '*' : '' }}</label>
@@ -70,12 +59,14 @@
     </div>
 
     <template #footer>
-      <Button label="Отмена" icon="pi pi-times" text @click="onCancel" />
-      <Button
-        label="Сохранить"
-        icon="pi pi-check"
-        @click="onSave"
+      <UIButton
+        action="cancel"
+        @click="onCancel"
+      />
+      <UIButton
+        action="save"
         :loading="loading"
+        @click="onSave"
       />
     </template>
   </Dialog>
@@ -84,9 +75,8 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Dropdown from 'primevue/dropdown'
 import Button from 'primevue/button'
+import { UIInput, UIDropdown, UIButton } from '../UI/ui-components'
 import FilePreview from './FilePreview.vue'
 
 const props = defineProps({

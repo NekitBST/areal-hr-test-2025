@@ -6,169 +6,123 @@
     modal
     :style="{ width: '600px' }"
   >
-    <div class="form-group">
-      <label for="last_name">Фамилия*</label>
-      <InputText
-        id="last_name"
-        v-model="formData.last_name"
-        :class="{ 'p-invalid': errors.last_name }"
-      />
-      <small class="p-error">{{ errors.last_name }}</small>
-    </div>
+    <UIInput
+      id="last_name"
+      v-model="formData.last_name"
+      label="Фамилия"
+      :error="errors.last_name"
+      required
+    />
 
-    <div class="form-group">
-      <label for="first_name">Имя*</label>
-      <InputText
-        id="first_name"
-        v-model="formData.first_name"
-        :class="{ 'p-invalid': errors.first_name }"
-      />
-      <small class="p-error">{{ errors.first_name }}</small>
-    </div>
+    <UIInput
+      id="first_name"
+      v-model="formData.first_name"
+      label="Имя"
+      :error="errors.first_name"
+      required
+    />
 
-    <div class="form-group">
-      <label for="middle_name">Отчество</label>
-      <InputText
-        id="middle_name"
-        v-model="formData.middle_name"
-        :class="{ 'p-invalid': errors.middle_name }"
-      />
-      <small class="p-error">{{ errors.middle_name }}</small>
-    </div>
+    <UIInput
+      id="middle_name"
+      v-model="formData.middle_name"
+      label="Отчество"
+      :error="errors.middle_name"
+    />
 
-    <div class="form-group">
-      <label for="date_of_birth">Дата рождения*</label>
-      <Calendar
-        id="date_of_birth"
-        v-model="formData.date_of_birth"
-        dateFormat="dd.mm.yy"
-        :showIcon="true"
-        iconDisplay="input"
-        :class="{ 'p-invalid': errors.date_of_birth }"
-      />
-      <small class="p-error">{{ errors.date_of_birth }}</small>
-    </div>
+    <UICalendar
+      id="date_of_birth"
+      v-model="formData.date_of_birth"
+      label="Дата рождения"
+      :error="errors.date_of_birth"
+      required
+    />
 
-    <div class="form-group">
-      <label for="passport_series">Серия паспорта</label>
-      <InputText
-        id="passport_series"
-        v-model="formData.passport_series"
-        :class="{ 'p-invalid': errors.passport_series }"
-      />
-      <small class="p-error">{{ errors.passport_series }}</small>
-    </div>
+    <UIInput
+      id="passport_series"
+      v-model="formData.passport_series"
+      label="Серия паспорта"
+      :error="errors.passport_series"
+    />
 
-    <div class="form-group">
-      <label for="passport_number">Номер паспорта</label>
-      <InputText
-        id="passport_number"
-        v-model="formData.passport_number"
-        :class="{ 'p-invalid': errors.passport_number }"
-      />
-      <small class="p-error">{{ errors.passport_number }}</small>
-    </div>
+    <UIInput
+      id="passport_number"
+      v-model="formData.passport_number"
+      label="Номер паспорта"
+      :error="errors.passport_number"
+    />
 
-    <div class="form-group">
-      <label for="passport_issue_date">Дата выдачи паспорта</label>
-      <Calendar
-        id="passport_issue_date"
-        v-model="formData.passport_issue_date"
-        dateFormat="dd.mm.yy"
-        :showIcon="true"
-        iconDisplay="input"
-        :class="{ 'p-invalid': errors.passport_issue_date }"
-      />
-      <small class="p-error">{{ errors.passport_issue_date }}</small>
-    </div>
+    <UICalendar
+      id="passport_issue_date"
+      v-model="formData.passport_issue_date"
+      label="Дата выдачи паспорта"
+      :error="errors.passport_issue_date"
+    />
 
-    <div class="form-group">
-      <label for="passport_department_code">Код подразделения</label>
-      <InputText
-        id="passport_department_code"
-        v-model="formData.passport_department_code"
-        :class="{ 'p-invalid': errors.passport_department_code }"
-      />
-      <small class="p-error">{{ errors.passport_department_code }}</small>
-    </div>
+    <UIInput
+      id="passport_department_code"
+      v-model="formData.passport_department_code"
+      label="Код подразделения"
+      :error="errors.passport_department_code"
+    />
 
-    <div class="form-group">
-      <label for="passport_issued_by">Кем выдан паспорт</label>
-      <InputText
-        id="passport_issued_by"
-        v-model="formData.passport_issued_by"
-        :class="{ 'p-invalid': errors.passport_issued_by }"
-      />
-      <small class="p-error">{{ errors.passport_issued_by }}</small>
-    </div>
+    <UIInput
+      id="passport_issued_by"
+      v-model="formData.passport_issued_by"
+      label="Кем выдан паспорт"
+      :error="errors.passport_issued_by"
+    />
 
-    <div class="form-group">
-      <label for="registration_area">Область/край/республика</label>
-      <InputText
-        id="registration_area"
-        v-model="formData.registration_area"
-        :class="{ 'p-invalid': errors.registration_area }"
-      />
-      <small class="p-error">{{ errors.registration_area }}</small>
-    </div>
+    <UIInput
+      id="registration_area"
+      v-model="formData.registration_area"
+      label="Область/край/республика"
+      :error="errors.registration_area"
+    />
 
-    <div class="form-group">
-      <label for="registration_city">Город</label>
-      <InputText
-        id="registration_city"
-        v-model="formData.registration_city"
-        :class="{ 'p-invalid': errors.registration_city }"
-      />
-      <small class="p-error">{{ errors.registration_city }}</small>
-    </div>
+    <UIInput
+      id="registration_city"
+      v-model="formData.registration_city"
+      label="Город"
+      :error="errors.registration_city"
+    />
 
-    <div class="form-group">
-      <label for="registration_street">Улица</label>
-      <InputText
-        id="registration_street"
-        v-model="formData.registration_street"
-        :class="{ 'p-invalid': errors.registration_street }"
-      />
-      <small class="p-error">{{ errors.registration_street }}</small>
-    </div>
+    <UIInput
+      id="registration_street"
+      v-model="formData.registration_street"
+      label="Улица"
+      :error="errors.registration_street"
+    />
 
-    <div class="form-group">
-      <label for="registration_house">Номер дома</label>
-      <InputText
-        id="registration_house"
-        v-model="formData.registration_house"
-        :class="{ 'p-invalid': errors.registration_house }"
-      />
-      <small class="p-error">{{ errors.registration_house }}</small>
-    </div>
+    <UIInput
+      id="registration_house"
+      v-model="formData.registration_house"
+      label="Номер дома"
+      :error="errors.registration_house"
+    />
 
-    <div class="form-group">
-      <label for="registration_building">Корпус/строение</label>
-      <InputText
-        id="registration_building"
-        v-model="formData.registration_building"
-        :class="{ 'p-invalid': errors.registration_building }"
-      />
-      <small class="p-error">{{ errors.registration_building }}</small>
-    </div>
+    <UIInput
+      id="registration_building"
+      v-model="formData.registration_building"
+      label="Корпус/строение"
+      :error="errors.registration_building"
+    />
 
-    <div class="form-group">
-      <label for="registration_apartment">Номер квартиры</label>
-      <InputText
-        id="registration_apartment"
-        v-model="formData.registration_apartment"
-        :class="{ 'p-invalid': errors.registration_apartment }"
-      />
-      <small class="p-error">{{ errors.registration_apartment }}</small>
-    </div>
+    <UIInput
+      id="registration_apartment"
+      v-model="formData.registration_apartment"
+      label="Номер квартиры"
+      :error="errors.registration_apartment"
+    />
 
     <template #footer>
-      <Button label="Отмена" icon="pi pi-times" text @click="onCancel" />
-      <Button
-        label="Сохранить"
-        icon="pi pi-check"
-        @click="onSave"
+      <UIButton
+        action="cancel"
+        @click="onCancel"
+      />
+      <UIButton
+        action="save"
         :loading="loading"
+        @click="onSave"
       />
     </template>
   </Dialog>
@@ -177,9 +131,7 @@
 <script setup>
 import { ref, reactive, watch } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Calendar from 'primevue/calendar'
-import Button from 'primevue/button'
+import { UIInput, UICalendar, UIButton } from '../UI/ui-components'
 
 const props = defineProps({
   visible: {

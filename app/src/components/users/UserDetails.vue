@@ -47,21 +47,11 @@
         <span>{{ new Date(user.updated_at).toLocaleString() }}</span>
       </div>
     </div>
-
-    <template #footer>
-      <Button
-        label="Закрыть"
-        icon="pi pi-times"
-        text
-        @click="$emit('update:visible', false)"
-      />
-    </template>
   </Dialog>
 </template>
 
 <script setup>
 import Dialog from 'primevue/dialog'
-import Button from 'primevue/button'
 
 const props = defineProps({
   visible: {

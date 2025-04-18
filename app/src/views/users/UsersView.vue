@@ -2,7 +2,10 @@
   <div class="users">
     <div class="header">
       <h1>Пользователи</h1>
-      <Button label="Создать" icon="pi pi-plus" @click="openCreateDialog" />
+      <UIButton
+        action="create"
+        @click="openCreateDialog"
+      />
     </div>
 
     <UsersTable
@@ -41,8 +44,8 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import { useUsersStore } from '../../stores/users'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
+import { UIButton } from '../../components/UI/ui-components'
 import UsersTable from '../../components/users/UsersTable.vue'
 import UserForm from '../../components/users/UserForm.vue'
 import UserDetails from '../../components/users/UserDetails.vue'

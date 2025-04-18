@@ -70,7 +70,8 @@ const objectTypeNames = {
   position: 'Должность',
   employee: 'Сотрудник',
   hr_operation: 'HR-операция',
-  file: 'Файл'
+  file: 'Файл',
+  user: 'Пользователь'
 }
 
 const getObjectTypeName = (type) => objectTypeNames[type] || type

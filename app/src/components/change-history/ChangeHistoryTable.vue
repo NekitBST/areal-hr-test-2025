@@ -31,11 +31,8 @@
     <Column header="Действия">
       <template #body="{ data }">
         <div class="actions">
-          <Button
-            icon="pi pi-eye"
-            text
-            rounded
-            severity="info"
+          <UIButton
+            action="view"
             @click="$emit('view', data)"
           />
         </div>
@@ -47,7 +44,7 @@
 <script setup>
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Button from 'primevue/button'
+import { UIButton } from '../UI/ui-components'
 
 const props = defineProps({
   changeHistory: {
@@ -72,7 +69,8 @@ const objectTypeNames = {
   position: 'Должность',
   employee: 'Сотрудник',
   hr_operation: 'HR-операция',
-  file: 'Файл'
+  file: 'Файл',
+  user: 'Пользователь'
 }
 
 const getObjectTypeName = (type) => objectTypeNames[type] || type

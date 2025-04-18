@@ -6,45 +6,40 @@
     modal
     :style="{ width: '450px' }"
   >
-    <div class="form-group">
-      <label for="name">Название*</label>
-      <InputText
-        id="name"
-        v-model="formData.name"
-        :class="{ 'p-invalid': errors.name }"
-      />
-      <small class="p-error">{{ errors.name }}</small>
-    </div>
+    <UIInput
+      id="name"
+      v-model="formData.name"
+      label="Название"
+      :error="errors.name"
+      required
+    />
 
-    <div class="form-group">
-      <label for="comment">Комментарий</label>
-      <Textarea
-        id="comment"
-        v-model="formData.comment"
-        rows="3"
-        :class="{ 'p-invalid': errors.comment }"
-      />
-      <small class="p-error">{{ errors.comment }}</small>
-    </div>
+    <UITextarea
+      id="comment"
+      v-model="formData.comment"
+      label="Комментарий"
+      :error="errors.comment"
+      :rows="3"
+    />
 
     <template #footer>
-      <Button label="Отмена" icon="pi pi-times" text @click="onCancel" />
-      <Button
-        label="Сохранить"
-        icon="pi pi-check"
-        @click="onSave"
+      <UIButton
+        action="cancel"
+        @click="onCancel"
+      />
+      <UIButton
+        action="save"
         :loading="loading"
+        @click="onSave"
       />
     </template>
   </Dialog>
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { reactive, watch } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
+import { UIInput, UITextarea, UIButton } from '../UI/ui-components'
 
 const props = defineProps({
   visible: {

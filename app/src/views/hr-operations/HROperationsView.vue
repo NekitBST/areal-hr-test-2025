@@ -2,7 +2,10 @@
   <div class="hr-operations">
     <div class="header">
       <h1>HR-операции</h1>
-      <Button label="Создать" icon="pi pi-plus" @click="openCreateDialog" />
+      <UIButton
+        action="create"
+        @click="openCreateDialog"
+      />
     </div>
 
     <HrOperationsTable
@@ -46,8 +49,8 @@ import { useDepartmentsStore } from '../../stores/departments'
 import { usePositionsStore } from '../../stores/positions'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
+import { UIButton } from '../../components/UI/ui-components'
 import HrOperationsTable from '../../components/hr-operations/HrOperationsTable.vue'
 import HrOperationForm from '../../components/hr-operations/HrOperationForm.vue'
 import HrOperationDetails from '../../components/hr-operations/HrOperationDetails.vue'

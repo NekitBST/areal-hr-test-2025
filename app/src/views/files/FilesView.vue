@@ -2,7 +2,10 @@
   <div class="files">
     <div class="header">
       <h1>Файлы</h1>
-      <Button label="Загрузить" icon="pi pi-upload" @click="openCreateDialog" />
+      <UIButton
+        action="upload"
+        @click="openCreateDialog"
+      />
     </div>
 
     <FilesTable
@@ -42,8 +45,8 @@ import { useFilesStore } from '../../stores/files'
 import { useEmployeesStore } from '../../stores/employees'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
+import { UIButton } from '../../components/UI/ui-components'
 import FilesTable from '../../components/files/FilesTable.vue'
 import FileForm from '../../components/files/FileForm.vue'
 import FileDetails from '../../components/files/FileDetails.vue'
@@ -94,9 +97,9 @@ const closeDialog = () => {
 }
 
 const clearErrors = () => {
-  formErrors.name = ''
-  formErrors.employee_id = ''
-  formErrors.file_path = ''
+  Object.keys(formErrors).forEach(key => {
+    formErrors[key] = ''
+  })
 }
 
 const showToast = (severity, summary, detail) => {

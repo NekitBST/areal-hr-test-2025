@@ -6,110 +6,79 @@
     modal
     :style="{ width: '450px' }"
   >
-    <div class="form-group">
-      <label for="employee_id">Сотрудник*</label>
-      <div class="p-inputgroup">
-        <Dropdown
-          id="employee_id"
-          v-model="formData.employee_id"
-          :options="employees"
-          optionLabel="full_name"
-          optionValue="id"
-          placeholder="Выберите сотрудника"
-          :class="{ 'p-invalid': errors.employee_id }"
-        />
-        <Button
-          icon="pi pi-times"
-          @click="formData.employee_id = null"
-          :disabled="!formData.employee_id"
-        />
-      </div>
-      <small class="p-error">{{ errors.employee_id }}</small>
-    </div>
+    <UIDropdown
+      id="employee_id"
+      v-model="formData.employee_id"
+      :options="employees"
+      optionLabel="full_name"
+      optionValue="id"
+      placeholder="Выберите сотрудника"
+      label="Сотрудник"
+      :error="errors.employee_id"
+      required
+    />
 
-    <div class="form-group">
-      <label for="department_id">Отдел*</label>
-      <div class="p-inputgroup">
-        <Dropdown
-          id="department_id"
-          v-model="formData.department_id"
-          :options="departments"
-          optionLabel="name"
-          optionValue="id"
-          placeholder="Выберите отдел"
-          :class="{ 'p-invalid': errors.department_id }"
-        />
-        <Button
-          icon="pi pi-times"
-          @click="formData.department_id = null"
-          :disabled="!formData.department_id"
-        />
-      </div>
-      <small class="p-error">{{ errors.department_id }}</small>
-    </div>
+    <UIDropdown
+      id="department_id"
+      v-model="formData.department_id"
+      :options="departments"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Выберите отдел"
+      label="Отдел"
+      :error="errors.department_id"
+      required
+    />
 
-    <div class="form-group">
-      <label for="position_id">Должность*</label>
-      <div class="p-inputgroup">
-        <Dropdown
-          id="position_id"
-          v-model="formData.position_id"
-          :options="positions"
-          optionLabel="name"
-          optionValue="id"
-          placeholder="Выберите должность"
-          :class="{ 'p-invalid': errors.position_id }"
-        />
-        <Button
-          icon="pi pi-times"
-          @click="formData.position_id = null"
-          :disabled="!formData.position_id"
-        />
-      </div>
-      <small class="p-error">{{ errors.position_id }}</small>
-    </div>
+    <UIDropdown
+      id="position_id"
+      v-model="formData.position_id"
+      :options="positions"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Выберите должность"
+      label="Должность"
+      :error="errors.position_id"
+      required
+    />
 
-    <div class="form-group">
-      <label for="action">Действие*</label>
-      <Dropdown
-        id="action"
-        v-model="formData.action"
-        :options="actions"
-        placeholder="Выберите действие"
-        :class="{ 'p-invalid': errors.action }"
-      />
-      <small class="p-error">{{ errors.action }}</small>
-    </div>
+    <UIDropdown
+      id="action"
+      v-model="formData.action"
+      :options="actions"
+      placeholder="Выберите действие"
+      label="Действие"
+      :error="errors.action"
+      required
+    />
 
-    <div class="form-group">
-      <label for="salary">Зарплата</label>
-      <InputNumber
-        id="salary"
-        v-model="formData.salary"
-        :min="0"
-        :class="{ 'p-invalid': errors.salary }"
-      />
-      <small class="p-error">{{ errors.salary }}</small>
-    </div>
+    <UIInput
+      id="salary"
+      v-model="formData.salary"
+      type="number"
+      label="Зарплата"
+      :error="errors.salary"
+      min="0"
+    />
 
     <template #footer>
-      <Button label="Отмена" icon="pi pi-times" text @click="onCancel" />
-      <Button
-        label="Сохранить"
-        icon="pi pi-check"
-        @click="onSave"
+      <UIButton
+        action="cancel"
+        @click="onCancel"
+      />
+      <UIButton
+        action="save"
         :loading="loading"
+        @click="onSave"
       />
     </template>
   </Dialog>
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue'
+import { reactive, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
-import Dropdown from 'primevue/dropdown'
-import InputNumber from 'primevue/inputnumber'
-import Button from 'primevue/button'
+import { UIInput, UIDropdown, UIButton } from '../UI/ui-components'
 
 const props = defineProps({
   visible: {

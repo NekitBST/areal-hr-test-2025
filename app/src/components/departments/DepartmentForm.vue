@@ -6,88 +6,65 @@
     modal
     :style="{ width: '450px' }"
   >
-    <div class="form-group">
-      <label for="name">Название*</label>
-      <InputText
-        id="name"
-        v-model="formData.name"
-        :class="{ 'p-invalid': errors.name }"
-      />
-      <small class="p-error">{{ errors.name }}</small>
-    </div>
+    <UIInput
+      id="name"
+      v-model="formData.name"
+      label="Название"
+      :error="errors.name"
+      required
+    />
 
-    <div class="form-group">
-      <label for="organization">Организация*</label>
-      <div class="p-inputgroup">
-        <Dropdown
-          id="organization"
-          v-model="formData.organization_id"
-          :options="organizations"
-          optionLabel="name"
-          optionValue="id"
-          placeholder="Выберите организацию"
-          :class="{ 'p-invalid': errors.organization_id }"
-        />
-        <Button
-          icon="pi pi-times"
-          @click="formData.organization_id = null"
-          :disabled="!formData.organization_id"
-        />
-      </div>
-      <small class="p-error">{{ errors.organization_id }}</small>
-    </div>
+    <UIDropdown
+      id="organization"
+      v-model="formData.organization_id"
+      :options="organizations"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Выберите организацию"
+      label="Организация"
+      :error="errors.organization_id"
+      :class="{ 'p-invalid': errors.organization_id }"
+      required
+    />
 
-    <div class="form-group">
-      <label for="parent">Родительский отдел</label>
-      <div class="p-inputgroup">
-        <Dropdown
-          id="parent"
-          v-model="formData.parent_id"
-          :options="availableDepartments"
-          optionLabel="name"
-          optionValue="id"
-          placeholder="Выберите родительский отдел"
-          :class="{ 'p-invalid': errors.parent_id }"
-        />
-        <Button
-          icon="pi pi-times"
-          @click="formData.parent_id = null"
-          :disabled="!formData.parent_id"
-        />
-      </div>
-      <small class="p-error">{{ errors.parent_id }}</small>
-    </div>
+    <UIDropdown
+      id="parent"
+      v-model="formData.parent_id"
+      :options="availableDepartments"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Выберите родительский отдел"
+      label="Родительский отдел"
+      :error="errors.parent_id"
+      :class="{ 'p-invalid': errors.parent_id }"
+    />
 
-    <div class="form-group">
-      <label for="comment">Комментарий</label>
-      <Textarea
-        id="comment"
-        v-model="formData.comment"
-        rows="3"
-        :class="{ 'p-invalid': errors.comment }"
-      />
-      <small class="p-error">{{ errors.comment }}</small>
-    </div>
+    <UITextarea
+      id="comment"
+      v-model="formData.comment"
+      label="Комментарий"
+      :error="errors.comment"
+      :rows="3"
+    />
 
     <template #footer>
-      <Button label="Отмена" icon="pi pi-times" text @click="onCancel" />
-      <Button
-        label="Сохранить"
-        icon="pi pi-check"
-        @click="onSave"
+      <UIButton
+        action="cancel"
+        @click="onCancel"
+      />
+      <UIButton
+        action="save"
         :loading="loading"
+        @click="onSave"
       />
     </template>
   </Dialog>
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
+import { UIInput, UITextarea, UIDropdown, UIButton } from '../UI/ui-components'
 
 const props = defineProps({
   visible: {

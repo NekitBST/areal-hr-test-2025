@@ -35,25 +35,16 @@
     <Column header="Действия">
       <template #body="{ data }">
         <div class="actions">
-          <Button
-            icon="pi pi-eye"
-            text
-            rounded
-            severity="info"
+          <UIButton
+            action="view"
             @click="$emit('view', data)"
           />
-          <Button
-            icon="pi pi-pencil"
-            text
-            rounded
-            severity="info"
+          <UIButton
+            action="edit"
             @click="$emit('edit', data)"
           />
-          <Button
-            icon="pi pi-trash"
-            text
-            rounded
-            severity="danger"
+          <UIButton
+            action="delete"
             @click="$emit('delete', data)"
           />
         </div>
@@ -63,10 +54,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Button from 'primevue/button'
+import { UIButton } from '../UI/ui-components'
 
 const props = defineProps({
   organizations: {

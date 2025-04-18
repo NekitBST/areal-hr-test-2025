@@ -9,7 +9,9 @@
   }
 
   .p-inputtext,
-  .p-textarea {
+  .p-textarea,
+  .p-calendar .p-inputtext,
+  .p-password input {
     width: 100%;
     border: 1px solid #e2e8f0;
     border-radius: 0.5rem;
@@ -33,6 +35,22 @@
       &:focus {
         box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
       }
+    }
+  }
+
+  .p-password.p-invalid input {
+    border-color: #ef4444;
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+    }
+  }
+
+  .p-calendar.p-invalid .p-inputtext {
+    border-color: #ef4444;
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
     }
   }
 

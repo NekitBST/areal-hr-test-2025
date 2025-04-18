@@ -2,7 +2,10 @@
   <div class="employees">
     <div class="header">
       <h1>Сотрудники</h1>
-      <Button label="Создать" icon="pi pi-plus" @click="openCreateDialog" />
+      <UIButton
+        action="create"
+        @click="openCreateDialog"
+      />
     </div>
 
     <EmployeesTable
@@ -40,8 +43,8 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import { useEmployeesStore } from '../../stores/employees'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
+import { UIButton } from '../../components/UI/ui-components'
 import EmployeesTable from '../../components/employees/EmployeesTable.vue'
 import EmployeeForm from '../../components/employees/EmployeeForm.vue'
 import EmployeeDetails from '../../components/employees/EmployeeDetails.vue'
@@ -97,21 +100,9 @@ const closeDialog = () => {
 }
 
 const clearErrors = () => {
-  formErrors.last_name = ''
-  formErrors.first_name = ''
-  formErrors.middle_name = ''
-  formErrors.date_of_birth = ''
-  formErrors.passport_series = ''
-  formErrors.passport_number = ''
-  formErrors.passport_issue_date = ''
-  formErrors.passport_department_code = ''
-  formErrors.passport_issued_by = ''
-  formErrors.registration_area = ''
-  formErrors.registration_city = ''
-  formErrors.registration_street = ''
-  formErrors.registration_house = ''
-  formErrors.registration_building = ''
-  formErrors.registration_apartment = ''
+  Object.keys(formErrors).forEach(key => {
+    formErrors[key] = ''
+  })
 }
 
 const showSuccess = (message) => {

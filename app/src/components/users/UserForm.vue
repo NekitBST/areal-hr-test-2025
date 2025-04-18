@@ -6,89 +6,70 @@
     modal
     :style="{ width: '450px' }"
   >
-    <div class="form-group">
-      <label for="last_name">Фамилия*</label>
-      <InputText
-        id="last_name"
-        v-model="formData.last_name"
-        :class="{ 'p-invalid': errors.last_name }"
-      />
-      <small class="p-error">{{ errors.last_name }}</small>
-    </div>
+    <UIInput
+      id="last_name"
+      v-model="formData.last_name"
+      label="Фамилия"
+      :error="errors.last_name"
+      required
+    />
 
-    <div class="form-group">
-      <label for="first_name">Имя*</label>
-      <InputText
-        id="first_name"
-        v-model="formData.first_name"
-        :class="{ 'p-invalid': errors.first_name }"
-      />
-      <small class="p-error">{{ errors.first_name }}</small>
-    </div>
+    <UIInput
+      id="first_name"
+      v-model="formData.first_name"
+      label="Имя"
+      :error="errors.first_name"
+      required
+    />
 
-    <div class="form-group">
-      <label for="middle_name">Отчество</label>
-      <InputText
-        id="middle_name"
-        v-model="formData.middle_name"
-        :class="{ 'p-invalid': errors.middle_name }"
-      />
-      <small class="p-error">{{ errors.middle_name }}</small>
-    </div>
+    <UIInput
+      id="middle_name"
+      v-model="formData.middle_name"
+      label="Отчество"
+      :error="errors.middle_name"
+    />
 
-    <div class="form-group">
-      <label for="login">Логин*</label>
-      <InputText
-        id="login"
-        v-model="formData.login"
-        :class="{ 'p-invalid': errors.login }"
-      />
-      <small class="p-error">{{ errors.login }}</small>
-    </div>
+    <UIInput
+      id="login"
+      v-model="formData.login"
+      label="Логин"
+      :error="errors.login"
+      required
+    />
 
-    <div class="form-group">
-      <label for="password">Пароль{{ mode === 'edit' ? ' (оставьте пустым, если не хотите менять)' : '*' }}</label>
-      <Password
-        id="password"
-        v-model="formData.password"
-        :feedback="false"
-        :toggleMask="true"
-        :class="{ 'p-invalid': errors.password }"
-      />
-      <small class="p-error">{{ errors.password }}</small>
-    </div>
+    <UIInput
+      id="password"
+      v-model="formData.password"
+      :label="'Пароль' + (mode === 'edit' ? ' (оставьте пустым, если не хотите менять)' : '')"
+      :error="errors.password"
+      type="password"
+      :required="mode === 'create'"
+    />
 
-    <div class="form-group">
-      <label for="role_id">Роль*</label>
-      <div class="p-inputgroup">
-        <Dropdown
-          id="role_id"
-          v-model="formData.role_id"
-          :options="[
-            { id: 1, name: 'Администратор' },
-            { id: 2, name: 'Менеджер по персоналу' }
-          ]"
-          optionLabel="name"
-          optionValue="id"
-          placeholder="Выберите роль"
-          :class="{ 'p-invalid': errors.role_id }"
-        />
-        <Button
-          icon="pi pi-times"
-          @click="formData.role_id = null"
-          :disabled="!formData.role_id"
-        />
-      </div>
-      <small class="p-error">{{ errors.role_id }}</small>
-    </div>
+    <UIDropdown
+      id="role_id"
+      v-model="formData.role_id"
+      :options="[
+        { id: 1, name: 'Администратор' },
+        { id: 2, name: 'Менеджер по персоналу' }
+      ]"
+      optionLabel="name"
+      optionValue="id"
+      label="Роль"
+      placeholder="Выберите роль"
+      :error="errors.role_id"
+      required
+    />
 
     <template #footer>
-      <Button label="Отмена" icon="pi pi-times" text @click="onCancel" />
-      <Button
-        label="Сохранить"
-        icon="pi pi-check"
-        @click="onSave"
+      <UIButton
+        action="cancel"
+        @click="onCancel"
+      />
+      <UIButton
+        action="save"
         :loading="loading"
+        @click="onSave"
       />
     </template>
   </Dialog>
@@ -97,10 +78,7 @@
 <script setup>
 import { ref, reactive, watch } from 'vue'
 import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
+import { UIInput, UIDropdown, UIButton } from '../UI/ui-components'
 
 const props = defineProps({
   visible: {

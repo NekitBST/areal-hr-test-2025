@@ -2,7 +2,10 @@
   <div class="departments">
     <div class="header">
       <h1>Отделы</h1>
-      <Button label="Создать" icon="pi pi-plus" @click="openCreateDialog" />
+      <UIButton
+        action="create"
+        @click="openCreateDialog"
+      />
     </div>
 
     <DepartmentsTable
@@ -45,11 +48,11 @@ import { useDepartmentsStore } from '../../stores/departments'
 import { useOrganizationsStore } from '../../stores/organizations'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
 import DepartmentsTable from '../../components/departments/DepartmentsTable.vue'
 import DepartmentForm from '../../components/departments/DepartmentForm.vue'
 import DepartmentDetails from '../../components/departments/DepartmentDetails.vue'
+import { UIButton } from '../../components/UI/ui-components'
 
 const store = useDepartmentsStore()
 const organizationsStore = useOrganizationsStore()

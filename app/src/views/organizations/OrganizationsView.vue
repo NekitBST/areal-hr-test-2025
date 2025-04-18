@@ -2,7 +2,10 @@
   <div class="organizations">
     <div class="header">
       <h1>Организации</h1>
-      <Button label="Создать" icon="pi pi-plus" @click="openCreateDialog" />
+      <UIButton
+        action="create"
+        @click="openCreateDialog"
+      />
     </div>
 
     <OrganizationsTable
@@ -40,11 +43,11 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import { useOrganizationsStore } from '../../stores/organizations'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
 import OrganizationsTable from '../../components/organizations/OrganizationsTable.vue'
 import OrganizationForm from '../../components/organizations/OrganizationForm.vue'
 import OrganizationDetails from '../../components/organizations/OrganizationDetails.vue'
+import { UIButton } from '../../components/UI/ui-components'
 
 const store = useOrganizationsStore()
 const confirm = useConfirm()

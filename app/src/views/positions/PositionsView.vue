@@ -2,7 +2,10 @@
   <div class="positions">
     <div class="header">
       <h1>Должности</h1>
-      <Button label="Создать" icon="pi pi-plus" @click="openCreateDialog" />
+      <UIButton
+        action="create"
+        @click="openCreateDialog"
+      />
     </div>
 
     <PositionsTable
@@ -40,11 +43,11 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import { usePositionsStore } from '../../stores/positions'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
 import ConfirmDialog from 'primevue/confirmdialog'
 import PositionsTable from '../../components/positions/PositionsTable.vue'
 import PositionForm from '../../components/positions/PositionForm.vue'
 import PositionDetails from '../../components/positions/PositionDetails.vue'
+import { UIButton } from '../../components/UI/ui-components'
 
 const store = usePositionsStore()
 const confirm = useConfirm()
