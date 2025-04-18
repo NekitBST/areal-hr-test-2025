@@ -15,7 +15,7 @@ exports.up = pgm => {
     object_type: {
       type: 'varchar(50)',
       notNull: true,
-      check: "object_type IN ('organization', 'department', 'position', 'employee', 'hr_operation', 'file')"
+      check: "object_type IN ('organization', 'department', 'position', 'employee', 'hr_operation', 'file', 'user')"
     },
     object_id: { type: 'integer', notNull: true },
     old_value: { type: 'jsonb' },

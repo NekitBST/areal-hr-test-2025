@@ -7,12 +7,14 @@ exports.up = pgm => {
       type: 'varchar(50)', 
       notNull: true,
       unique: true 
-    },
-    access_level: { 
-      type: 'integer',
-      notNull: true 
     }
   });
+
+  pgm.sql(`
+    INSERT INTO roles (name) VALUES 
+    ('ADMIN'),
+    ('HR_MANAGER');
+  `);
 };
 
 exports.down = pgm => {
