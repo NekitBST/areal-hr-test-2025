@@ -37,6 +37,11 @@
         <h3>История изменений</h3>
         <p>История изменений</p>
       </router-link>
+      <router-link to="/users" class="card">
+        <i class="pi pi-user-edit"></i>
+        <h3>Пользователи</h3>
+        <p>Управление пользователями</p>
+      </router-link>
     </div>
   </div>
 </template> 

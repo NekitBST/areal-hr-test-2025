@@ -22,6 +22,14 @@ export const organizationsApi = {
   delete: (id) => api.delete(`/organizations/${id}`)
 }
 
+export const usersApi = {
+  getAll: () => api.get('/users'),
+  getById: (id) => api.get(`/users/${id}`),
+  create: (data) => api.post('/users', data),
+  update: (id, data) => api.put(`/users/${id}`, data),
+  delete: (id) => api.delete(`/users/${id}`)
+}
+
 export const positionsApi = {
   getAll: () => api.get('/positions'),
   getById: (id) => api.get(`/positions/${id}`),

@@ -12,8 +12,8 @@ exports.up = pgm => {
 
   pgm.sql(`
     INSERT INTO roles (name) VALUES 
-    ('ADMIN'),
-    ('HR_MANAGER');
+    ('Администратор'),
+    ('Менеджер по персоналу');
   `);
 };
 

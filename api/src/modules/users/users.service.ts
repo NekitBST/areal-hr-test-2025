@@ -14,7 +14,7 @@ export class UsersService {
   async findAll() {
     const result = await this.dbService.query(
       'SELECT u.id, u.last_name, u.first_name, u.middle_name, u.login, ' +
-      'u.created_at, u.updated_at, r.name as role_name ' +
+      'u.created_at, u.updated_at, u.role_id, r.name as role_name ' +
       'FROM users u ' +
       'JOIN roles r ON u.role_id = r.id ' +
       'WHERE u.deleted_at IS NULL ' +
@@ -27,7 +27,7 @@ export class UsersService {
   async findOne(id: number) {
     const result = await this.dbService.query(
       'SELECT u.id, u.last_name, u.first_name, u.middle_name, u.login, ' +
-      'u.created_at, u.updated_at, r.name as role_name ' +
+      'u.created_at, u.updated_at, u.role_id, r.name as role_name ' +
       'FROM users u ' +
       'JOIN roles r ON u.role_id = r.id ' +
       'WHERE u.id = $1 AND u.deleted_at IS NULL',
@@ -64,11 +64,17 @@ export class UsersService {
     const result = await (client || this.dbService).query(
       'INSERT INTO users (last_name, first_name, middle_name, login, password_hash, role_id) ' +
       'VALUES ($1, $2, $3, $4, $5, $6) ' +
-      'RETURNING id, last_name, first_name, middle_name, login, created_at, updated_at',
+      'RETURNING id, last_name, first_name, middle_name, login, role_id, created_at, updated_at',
       [last_name, first_name, middle_name, login, password_hash, role_id]
     );
 
-    return result.rows[0];
+    const user = result.rows[0];
+    const roleResult = await (client || this.dbService).query(
+      'SELECT name as role_name FROM roles WHERE id = $1',
+      [user.role_id]
+    );
+    
+    return { ...user, role_name: roleResult.rows[0].name };
   }
 
   @LogChanges('user')
@@ -120,11 +126,17 @@ export class UsersService {
     const result = await (client || this.dbService).query(
       `UPDATE users SET ${updateFields.join(', ')} ` +
       `WHERE id = $${valueIndex} AND deleted_at IS NULL ` +
-      'RETURNING id, last_name, first_name, middle_name, login, created_at, updated_at',
+      'RETURNING id, last_name, first_name, middle_name, login, role_id, created_at, updated_at',
       values
     );
 
-    return result.rows[0];
+    const user = result.rows[0];
+    const roleResult = await (client || this.dbService).query(
+      'SELECT name as role_name FROM roles WHERE id = $1',
+      [user.role_id]
+    );
+    
+    return { ...user, role_name: roleResult.rows[0].name };
   }
 
   @LogChanges('user')
@@ -145,7 +157,7 @@ export class UsersService {
     const result = await (client || this.dbService).query(
       'UPDATE users SET deleted_at = CURRENT_TIMESTAMP ' +
       'WHERE id = $1 AND deleted_at IS NULL ' +
-      'RETURNING id, last_name, first_name, middle_name, login, created_at, updated_at, deleted_at',
+      'RETURNING id, last_name, first_name, middle_name, login, role_id, created_at, updated_at, deleted_at',
       [id]
     );
 

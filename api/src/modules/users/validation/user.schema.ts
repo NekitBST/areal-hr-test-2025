@@ -51,7 +51,7 @@ export const createUserSchema = Joi.object({
   role_id: Joi.number()
     .required()
     .messages({
-      'number.base': 'Роль должна быть числом',
+      'number.base': 'Роль обязательна для заполнения (выберите роль из списка)',
       'any.required': 'Роль обязательна для заполнения'
     })
 });
@@ -98,6 +98,6 @@ export const updateUserSchema = Joi.object({
     }),
   role_id: Joi.number()
     .messages({
-      'number.base': 'Роль должна быть числом'
+      'number.base': 'Роль не может быть пустой (выберите роль из списка или оставьте предыдущую)'
     })
 }); 
