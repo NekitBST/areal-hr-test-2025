@@ -12,9 +12,8 @@ exports.up = pgm => {
       unique: true 
     },
     password_hash: { 
-      type: 'varchar(255)', 
-      notNull: true,
-      check: "password_hash ~ '^\$argon2id\$'" 
+      type: 'text', 
+      notNull: true
     },
     role_id: {
       type: 'integer',
