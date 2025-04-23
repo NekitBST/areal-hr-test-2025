@@ -17,8 +17,8 @@ export const createFileSchema = Joi.object({
   employee_id: Joi.number()
     .required()
     .messages({
-      'number.base': 'ID сотрудника должно быть числом и обязательно для заполнения (выберите из списка)',
-      'any.required': 'ID сотрудника обязателен для заполнения'
+      'number.base': 'ID сотрудника должно быть числом',
+      'any.required': 'ID сотрудника обязателен для заполнения (выберите из списка)'
     })
 });
 
@@ -35,8 +35,10 @@ export const updateFileSchema = Joi.object({
   file_path: Joi.string(),
 
   employee_id: Joi.number()
+    .required()
     .messages({
-      'number.base': 'ID сотрудника должно быть числом и обязательно для заполнения (выберите из списка или оставьте выбранного)'
+      'number.base': 'ID сотрудника должно быть числом',
+      'any.required': 'ID сотрудника обязателен для заполнения (выберите из списка или оставьте выбранного)'
     }).min(1).messages({
       'object.min': 'Необходимо указать хотя бы одно поле для обновления'
     })

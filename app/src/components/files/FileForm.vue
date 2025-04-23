@@ -163,15 +163,18 @@ const handleFileChange = (event) => {
 
 const onSave = () => {
   const data = new FormData()
-  data.append('name', formData.name.trim())
-  data.append('employee_id', formData.employee_id?.toString() || '')
+  
+  data.append('name', formData.name?.trim() || '')
+  
+  if (formData.employee_id) {
+    data.append('employee_id', formData.employee_id.toString())
+  }
+  
   if (formData.file) {
     data.append('file_path', formData.file)
   }
-  emit('save', props.mode === 'create' || formData.file ? data : {
-    name: formData.name.trim(),
-    employee_id: formData.employee_id
-  })
+  
+  emit('save', data)
 }
 
 const onCancel = () => {

@@ -2,10 +2,16 @@
   <div class="employees">
     <div class="header">
       <h1>Сотрудники</h1>
-      <UIButton
-        action="create"
-        @click="openCreateDialog"
-      />
+      <div class="actions">
+        <UIButton
+          action="create"
+          @click="openCreateDialog"
+        />
+        <UIButton
+          action="upload"
+          @click="openFileUploadDialog"
+        />
+      </div>
     </div>
 
     <EmployeesTable
@@ -34,6 +40,20 @@
       :employee="employeeDetails"
     />
 
+    <FileForm
+      v-model:visible="fileDialogVisible"
+      mode="create"
+      :loading="loading"
+      :file="{ employee_id: selectedEmployee?.id }"
+      :employees="selectedEmployee ? [{
+        ...selectedEmployee,
+        full_name: `${selectedEmployee.last_name} ${selectedEmployee.first_name}`
+      }] : []"
+      :errors="formErrors"
+      @save="saveFile"
+      @cancel="() => fileDialogVisible = false"
+    />
+
     <ConfirmDialog />
   </div>
 </template>
@@ -41,6 +61,7 @@
 <script setup>
 import { ref, onMounted, reactive, computed } from 'vue'
 import { useEmployeesStore } from '../../stores/employees'
+import { useFilesStore } from '../../stores/files'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
@@ -48,12 +69,15 @@ import { UIButton } from '../../components/UI/ui-components'
 import EmployeesTable from '../../components/employees/EmployeesTable.vue'
 import EmployeeForm from '../../components/employees/EmployeeForm.vue'
 import EmployeeDetails from '../../components/employees/EmployeeDetails.vue'
+import FileForm from '../../components/files/FileForm.vue'
 
 const store = useEmployeesStore()
+const filesStore = useFilesStore()
 const confirm = useConfirm()
 const toast = useToast()
 
 const dialogVisible = ref(false)
+const fileDialogVisible = ref(false)
 const dialogMode = ref('create')
 const selectedEmployee = ref(null)
 const formErrors = reactive({
@@ -221,7 +245,51 @@ const viewDetails = async (employee) => {
   }
 }
 
+const openFileUploadDialog = () => {
+  if (!selectedEmployee.value) {
+    toast.add({
+      severity: 'warn',
+      summary: 'Внимание',
+      detail: 'Пожалуйста, выберите сотрудника для загрузки файла',
+      life: 3000
+    })
+    return
+  }
+  fileDialogVisible.value = true
+}
+
+const saveFile = async (formData) => {
+  try {
+    Object.keys(formErrors).forEach(key => {
+      formErrors[key] = ''
+    })
+
+    await filesStore.createFile(formData)
+    fileDialogVisible.value = false
+    toast.add({
+      severity: 'success',
+      summary: 'Успешно',
+      detail: 'Файл загружен',
+      life: 3000
+    })
+  } catch (error) {
+    if (error.response?.data?.errors) {
+      error.response.data.errors.forEach(errorMessage => {
+        if (errorMessage.includes('Название файла')) {
+          formErrors.name = errorMessage
+        } else if (errorMessage.includes('ID сотрудника')) {
+          formErrors.employee_id = errorMessage
+        } else if (errorMessage.includes('Файл')) {
+          formErrors.file_path = errorMessage
+        }
+      })
+    } else {
+      handleError(error)
+    }
+  }
+}
+
 onMounted(async () => {
   await store.fetchEmployees()
 })
-</script> 
+</script>
