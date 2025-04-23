@@ -78,6 +78,21 @@
         <span>{{ employee.registration_apartment }}</span>
       </div>
       
+      <div v-if="employee.department_name || employee.position_name || employee.salary" class="section-title">Рабочие данные</div>
+      
+      <div class="detail-item" v-if="employee.department_name">
+        <label>Отдел:</label>
+        <span>{{ employee.department_name }}</span>
+      </div>
+      <div class="detail-item" v-if="employee.position_name">
+        <label>Должность:</label>
+        <span>{{ employee.position_name }}</span>
+      </div>
+      <div class="detail-item" v-if="employee.salary">
+        <label>Зарплата:</label>
+        <span>{{ employee.salary }} ₽</span>
+      </div>
+      
       <div class="detail-item">
         <label>Создано:</label>
         <span>{{ new Date(employee.created_at).toLocaleString() }}</span>

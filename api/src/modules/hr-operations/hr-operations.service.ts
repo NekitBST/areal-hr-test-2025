@@ -43,6 +43,14 @@ export class HrOperationsService {
       'RETURNING id, employee_id, department_id, position_id, salary, action, action_date, created_at, updated_at',
       [employee_id, department_id, position_id, salary, action]
     );
+
+    if (['Прием на работу', 'Перевод', 'Изменение зарплаты'].includes(action)) {
+      await (client || this.dbService).query(
+        'UPDATE employees SET updated_at = CURRENT_TIMESTAMP ' +
+        'WHERE id = $1',
+        [employee_id]
+      );
+    }
     
     return result.rows[0];
   }

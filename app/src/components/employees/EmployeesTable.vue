@@ -27,6 +27,21 @@
         {{ new Date(data.date_of_birth).toLocaleDateString() }}
       </template>
     </Column>
+    <Column field="department_name" header="Отдел" sortable>
+      <template #body="{ data }">
+        <span>{{ data.department_name || '-' }}</span>
+      </template>
+    </Column>
+    <Column field="position_name" header="Должность" sortable>
+      <template #body="{ data }">
+        <span>{{ data.position_name || '-' }}</span>
+      </template>
+    </Column>
+    <Column field="salary" header="Зарплата" sortable>
+      <template #body="{ data }">
+        <span>{{ data.salary ? `${data.salary} ₽` : '-' }}</span>
+      </template>
+    </Column>
     <Column field="created_at" header="Создано" sortable>
       <template #body="{ data }">
         {{ new Date(data.created_at).toLocaleString() }}

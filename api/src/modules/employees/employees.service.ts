@@ -12,11 +12,23 @@ export class EmployeesService {
 
   async findAll() {
     const result = await this.dbService.query(
-      'SELECT id, last_name, first_name, middle_name, date_of_birth, ' +
-      'passport_series, passport_number, passport_issue_date, passport_department_code, ' +
-      'passport_issued_by, registration_area, registration_city, registration_street, ' +
-      'registration_house, registration_building, registration_apartment, created_at, updated_at ' +
-      'FROM employees WHERE deleted_at IS NULL ORDER BY id'
+      'SELECT e.id, e.last_name, e.first_name, e.middle_name, e.date_of_birth, ' +
+      'e.passport_series, e.passport_number, e.passport_issue_date, e.passport_department_code, ' +
+      'e.passport_issued_by, e.registration_area, e.registration_city, e.registration_street, ' +
+      'e.registration_house, e.registration_building, e.registration_apartment, e.created_at, e.updated_at, ' +
+      'd.name as department_name, p.name as position_name, ho.salary ' +
+      'FROM employees e ' +
+      'LEFT JOIN LATERAL ( ' +
+      '  SELECT department_id, position_id, salary ' +
+      '  FROM hr_operations ' +
+      '  WHERE employee_id = e.id AND deleted_at IS NULL ' +
+      '  ORDER BY action_date DESC, created_at DESC ' +
+      '  LIMIT 1 ' +
+      ') ho ON true ' +
+      'LEFT JOIN departments d ON d.id = ho.department_id ' +
+      'LEFT JOIN positions p ON p.id = ho.position_id ' +
+      'WHERE e.deleted_at IS NULL ' +
+      'ORDER BY e.id'
     );
 
     return result.rows;
@@ -24,11 +36,22 @@ export class EmployeesService {
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      'SELECT id, last_name, first_name, middle_name, date_of_birth, ' +
-      'passport_series, passport_number, passport_issue_date, passport_department_code, ' +
-      'passport_issued_by, registration_area, registration_city, registration_street, ' +
-      'registration_house, registration_building, registration_apartment, created_at, updated_at ' +
-      'FROM employees WHERE id = $1 AND deleted_at IS NULL',
+      'SELECT e.id, e.last_name, e.first_name, e.middle_name, e.date_of_birth, ' +
+      'e.passport_series, e.passport_number, e.passport_issue_date, e.passport_department_code, ' +
+      'e.passport_issued_by, e.registration_area, e.registration_city, e.registration_street, ' +
+      'e.registration_house, e.registration_building, e.registration_apartment, e.created_at, e.updated_at, ' +
+      'd.name as department_name, p.name as position_name, ho.salary ' +
+      'FROM employees e ' +
+      'LEFT JOIN LATERAL ( ' +
+      '  SELECT department_id, position_id, salary ' +
+      '  FROM hr_operations ' +
+      '  WHERE employee_id = e.id AND deleted_at IS NULL ' +
+      '  ORDER BY action_date DESC, created_at DESC ' +
+      '  LIMIT 1 ' +
+      ') ho ON true ' +
+      'LEFT JOIN departments d ON d.id = ho.department_id ' +
+      'LEFT JOIN positions p ON p.id = ho.position_id ' +
+      'WHERE e.id = $1 AND e.deleted_at IS NULL',
       [id]
     );
 

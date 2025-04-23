@@ -27,9 +27,9 @@
         <span>{{ positionName }}</span>
       </div>
 
-      <div class="detail-item">
-        <label>Действие:</label>
-        <span>{{ hrOperation.action }}</span>
+      <div class="detail-item" v-if="hrOperation.salary">
+        <label>Зарплата:</label>
+        <span>{{ hrOperation.salary }} ₽</span>
       </div>
 
       <div class="detail-item">
@@ -37,9 +37,9 @@
         <span>{{ new Date(hrOperation.action_date).toLocaleString() }}</span>
       </div>
 
-      <div class="detail-item" v-if="hrOperation.salary">
-        <label>Зарплата:</label>
-        <span>{{ hrOperation.salary }} ₽</span>
+      <div class="detail-item">
+        <label>Действие:</label>
+        <span>{{ hrOperation.action }}</span>
       </div>
 
       <div class="detail-item">

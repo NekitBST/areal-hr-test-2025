@@ -27,14 +27,14 @@
         {{ getPositionName(data.position_id) }}
       </template>
     </Column>
-    <Column field="action_date" header="Дата действия" sortable>
-      <template #body="{ data }">
-        {{ new Date(data.action_date).toLocaleString() }}
-      </template>
-    </Column>
     <Column field="salary" header="Зарплата" sortable>
       <template #body="{ data }">
         {{ data.salary ? `${data.salary} ₽` : '-' }}
+      </template>
+    </Column>
+    <Column field="action_date" header="Дата действия" sortable>
+      <template #body="{ data }">
+        {{ new Date(data.action_date).toLocaleString() }}
       </template>
     </Column>
     <Column field="action" header="Действие" sortable />
