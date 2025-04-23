@@ -10,13 +10,14 @@ export function LogChanges(objectType: string) {
 
     descriptor.value = async function (...args: any[]) {
       const dbService = this.dbService as DatabaseService;
+      const client = args[args.length - 1]?.query ? args[args.length - 1] : null;
       
-      return dbService.withTransaction(async (client) => {
+      const executeWithClient = async (transactionClient) => {
         let oldValue: Record<string, any> | null = null;
 
         if (propertyKey === 'update' || propertyKey === 'softDelete') {
           const id = args[0];
-          const checkResult = await client.query(
+          const checkResult = await transactionClient.query(
             `SELECT * FROM ${objectType}s WHERE id = $1`,
             [id]
           );
@@ -25,7 +26,7 @@ export function LogChanges(objectType: string) {
           }
         }
 
-        const result = await originalMethod.apply(this, args);
+        const result = await originalMethod.apply(this, client ? args : [...args, transactionClient]);
         
         let newValue: Record<string, any> = { ...result };
         
@@ -39,7 +40,7 @@ export function LogChanges(objectType: string) {
         }
 
         const userId = 1; // хардкодим будет пока что по умолчанию id юзера 1
-        await client.query(
+        await transactionClient.query(
           `INSERT INTO change_history (
             changed_by,
             object_type,
@@ -58,7 +59,13 @@ export function LogChanges(objectType: string) {
         );
 
         return result;
-      });
+      };
+
+      if (client) {
+        return executeWithClient(client);
+      }
+
+      return dbService.withTransaction(executeWithClient);
     };
 
     return descriptor;
