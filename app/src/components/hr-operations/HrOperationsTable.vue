@@ -14,7 +14,7 @@
     <Column field="id" header="ID" sortable />
     <Column field="employee_id" header="Сотрудник" sortable>
       <template #body="{ data }">
-        {{ getEmployeeFullName(data.employee_id) }}
+        {{ data.first_name && data.last_name ? `${data.last_name} ${data.first_name}` : getEmployeeFullName(data.employee_id) }}
       </template>
     </Column>
     <Column field="department_id" header="Отдел" sortable>

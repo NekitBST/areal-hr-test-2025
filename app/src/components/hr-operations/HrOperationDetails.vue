@@ -14,7 +14,9 @@
       
       <div class="detail-item">
         <label>Сотрудник:</label>
-        <span>{{ employeeFullName }}</span>
+        <span>{{ hrOperation.first_name && hrOperation.last_name ? 
+          `${hrOperation.last_name} ${hrOperation.first_name}` : 
+          employeeFullName }}</span>
       </div>
 
       <div class="detail-item">
