@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -8,8 +8,14 @@ import { UpdateFileDto } from './dto/update-file.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createFileSchema, updateFileSchema } from './validation/file.schema';
 import { DatabaseService } from '../../common/services/database.service';
+import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { Role } from '../auth/enums/role.enum';
 
 @Controller('files')
+@UseGuards(AuthenticatedGuard, RoleGuard)
+@Roles(Role.ADMIN, Role.MANAGER)
 export class FilesController {
   constructor(
     private readonly filesService: FilesService,

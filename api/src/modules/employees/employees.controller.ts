@@ -1,12 +1,18 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createEmployeeSchema, updateEmployeeSchema } from './validation/employee.schema';
 import { DatabaseService } from '../../common/services/database.service';
+import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { Role } from '../auth/enums/role.enum';
 
 @Controller('employees')
+@UseGuards(AuthenticatedGuard, RoleGuard)
+@Roles(Role.ADMIN, Role.MANAGER)
 export class EmployeesController {
   constructor(
     private readonly employeesService: EmployeesService,

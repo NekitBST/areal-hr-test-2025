@@ -1,12 +1,18 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
 import { createOrganizationSchema, updateOrganizationSchema } from './validation/organization.schema';
 import { DatabaseService } from '../../common/services/database.service';
+import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { Role } from '../auth/enums/role.enum';
 
 @Controller('organizations')
+@UseGuards(AuthenticatedGuard, RoleGuard)
+@Roles(Role.ADMIN, Role.MANAGER)
 export class OrganizationsController {
   constructor(
     private readonly organizationsService: OrganizationsService,
