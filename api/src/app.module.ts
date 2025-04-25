@@ -9,6 +9,7 @@ import { FilesModule } from './modules/files/files.module';
 import { HrOperationsModule } from './modules/hr-operations/hr-operations.module';
 import { ChangeHistoryModule } from './modules/change-history/change-history.module';
 import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Controller()
 export class AppController {
@@ -30,7 +31,8 @@ export class AppController {
     FilesModule,
     HrOperationsModule,
     ChangeHistoryModule,
-    UsersModule
+    UsersModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [DatabaseService],

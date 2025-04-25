@@ -163,4 +163,21 @@ export class UsersService {
 
     return result.rows[0];
   }
+
+  async findByLogin(login: string) {
+    const result = await this.dbService.query(
+      'SELECT u.id, u.last_name, u.first_name, u.middle_name, u.login, u.password_hash, ' +
+      'u.created_at, u.updated_at, u.role_id, r.name as role_name ' +
+      'FROM users u ' +
+      'JOIN roles r ON u.role_id = r.id ' +
+      'WHERE u.login = $1 AND u.deleted_at IS NULL',
+      [login]
+    );
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return result.rows[0];
+  }
 } 
