@@ -1,0 +1,150 @@
+body {
+  &:has(.login-page) {
+    background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+  padding: 2rem;
+  isolation: isolate;
+
+
+  .p-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 400px;
+    margin: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 1px 2px rgba(0, 0, 0, 0.05);
+
+    .p-card-title {
+      padding: 1.5rem 1.5rem 0;
+      margin: 0;
+
+      h2 {
+        color: var(--primary-color);
+        font-size: 1.75rem;
+        font-weight: 600;
+        text-align: center;
+        margin: 0;
+      }
+    }
+
+    .p-card-content {
+      padding: 1.5rem;
+    }
+  }
+
+  .login-form {
+    .form-field {
+      margin-bottom: 1.5rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-color);
+        font-size: 0.875rem;
+      }
+
+      .p-inputtext,
+      .p-password input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--surface-border);
+        transition: all 0.2s ease;
+        font-size: 0.95rem;
+        background-color: #fff;
+
+        &:hover {
+          border-color: var(--primary-color);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 2px var(--primary-100);
+        }
+
+        &::placeholder {
+          color: var(--text-color-secondary);
+          opacity: 0.7;
+        }
+      }
+
+      .p-password {
+        width: 100%;
+        display: block;
+
+        i {
+          color: var(--text-color-secondary);
+          transition: color 0.2s ease;
+
+          &:hover {
+            color: var(--text-color);
+          }
+        }
+      }
+    }
+
+    .p-button {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.75rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+
+      &:not(.p-button-loading):hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &.p-button-loading {
+        background: var(--primary-600);
+
+        .p-button-label {
+          opacity: 0;
+        }
+      }
+
+      .p-button-label {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+body:has(.login-page) {
+  .p-toast {
+    opacity: 0.98;
+    
+    .p-toast-message {
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  }
+} 
