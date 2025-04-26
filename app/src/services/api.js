@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
-import { useToast } from 'primevue/usetoast'
+import router from '../router'
 
 const api = axios.create({
   baseURL: `http://${import.meta.env.VITE_DB_HOST}:${import.meta.env.VITE_PORT}/api`,
@@ -20,18 +20,12 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    const toast = useToast()
     const authStore = useAuthStore()
 
     if (error.response?.status === 401) {
       authStore.clearAuth()
       if (error.config.url !== '/auth/login') {
-        toast.add({
-          severity: 'warn',
-          summary: 'Сессия истекла',
-          detail: 'Пожалуйста, войдите снова',
-          life: 5000
-        })
+        router.push('/login')
       }
     }
     return Promise.reject(error)

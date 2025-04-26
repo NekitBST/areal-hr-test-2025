@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseInterceptors, UploadedFile, UseGuards, Req } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -12,7 +12,7 @@ import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../auth/enums/role.enum';
-
+import { Request } from 'express';
 @Controller('files')
 @UseGuards(AuthenticatedGuard, RoleGuard)
 @Roles(Role.ADMIN, Role.MANAGER)
@@ -49,12 +49,13 @@ export class FilesController {
     }
   }))
   async create(
+    @Req() request: Request,
     @UploadedFile() file,
     @Body(new JoiValidationPipe(createFileSchema)) createFileDto: CreateFileDto,
   ) {
     createFileDto.file_path = file.path.replace(/\\/g, '/');
     return this.dbService.withTransaction(async (client) => {
-      return this.filesService.create(createFileDto, client);
+      return this.filesService.create(request, createFileDto, client);
     });
   }
 
@@ -75,6 +76,7 @@ export class FilesController {
     }
   }))
   async update(
+    @Req() request: Request,
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file,
     @Body(new JoiValidationPipe(updateFileSchema)) updateFileDto: UpdateFileDto,
@@ -83,14 +85,17 @@ export class FilesController {
       updateFileDto.file_path = file.path.replace(/\\/g, '/');
     }
     return this.dbService.withTransaction(async (client) => {
-      return this.filesService.update(id, updateFileDto, client);
+      return this.filesService.update(request, id, updateFileDto, client);
     });
   }
 
   @Delete(':id')
-  async softDelete(@Param('id', ParseIntPipe) id: number) {
+  async softDelete(
+    @Req() request: Request, 
+    @Param('id', ParseIntPipe) id: number
+  ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.filesService.softDelete(id, client);
+      return this.filesService.softDelete(request, id, client);
     });
   }
 } 

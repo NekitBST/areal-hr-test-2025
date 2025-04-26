@@ -5,6 +5,7 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
+import { Request } from 'express';
 
 @Injectable()
 export class OrganizationsService {
@@ -34,7 +35,7 @@ export class OrganizationsService {
   }
 
   @LogChanges('organization')
-  async create(createOrganizationDto: CreateOrganizationDto, client?: PoolClient) {
+  async create(request: Request, createOrganizationDto: CreateOrganizationDto, client?: PoolClient) {
     const { name, comment } = createOrganizationDto;
     const result = await (client || this.dbService).query(
       'INSERT INTO organizations (name, comment) ' +
@@ -46,7 +47,7 @@ export class OrganizationsService {
   }
 
   @LogChanges('organization')
-  async softDelete(id: number, client?: PoolClient) {
+  async softDelete(request: Request, id: number, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM organizations WHERE id = $1',
       [id]
@@ -71,7 +72,7 @@ export class OrganizationsService {
   }
 
   @LogChanges('organization')
-  async update(id: number, updateOrganizationDto: UpdateOrganizationDto, client?: PoolClient) {
+  async update(request: Request, id: number, updateOrganizationDto: UpdateOrganizationDto, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM organizations WHERE id = $1',
       [id]

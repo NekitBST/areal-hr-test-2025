@@ -1,4 +1,12 @@
 import { DatabaseService } from '../common/services/database.service';
+import { UnauthorizedException } from '@nestjs/common';
+import { Request } from 'express';
+
+interface RequestWithUser extends Request {
+  user: {
+    id: number;
+  };
+}
 
 export function LogChanges(objectType: string) {
   return function (
@@ -12,11 +20,18 @@ export function LogChanges(objectType: string) {
       const dbService = this.dbService as DatabaseService;
       const client = args[args.length - 1]?.query ? args[args.length - 1] : null;
       
+      const request = args[0] as RequestWithUser;
+      const userId = request?.user?.id;
+
+      if (!userId) {
+        throw new UnauthorizedException('User not authenticated');
+      }
+      
       const executeWithClient = async (transactionClient) => {
         let oldValue: Record<string, any> | null = null;
 
         if (propertyKey === 'update' || propertyKey === 'softDelete') {
-          const id = args[0];
+          const id = args[1];
           const checkResult = await transactionClient.query(
             `SELECT * FROM ${objectType}s WHERE id = $1`,
             [id]
@@ -39,7 +54,6 @@ export function LogChanges(objectType: string) {
           }
         }
 
-        const userId = 1; // хардкодим будет пока что по умолчанию id юзера 1
         await transactionClient.query(
           `INSERT INTO change_history (
             changed_by,

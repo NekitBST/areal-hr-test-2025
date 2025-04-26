@@ -5,6 +5,7 @@ import { UpdateFileDto } from './dto/update-file.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
+import { Request } from 'express';
 
 @Injectable()
 export class FilesService {
@@ -34,7 +35,7 @@ export class FilesService {
   }
 
   @LogChanges('file')
-  async create(createFileDto: CreateFileDto, client?: PoolClient) {
+  async create(request: Request, createFileDto: CreateFileDto, client?: PoolClient) {
     const employeeExists = await (client || this.dbService).query(
       'SELECT id FROM employees WHERE id = $1 AND deleted_at IS NULL',
       [createFileDto.employee_id]
@@ -56,7 +57,7 @@ export class FilesService {
   }
 
   @LogChanges('file')
-  async update(id: number, updateFileDto: UpdateFileDto, client?: PoolClient) {
+  async update(request: Request, id: number, updateFileDto: UpdateFileDto, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM files WHERE id = $1',
       [id]
@@ -101,7 +102,7 @@ export class FilesService {
   }
 
   @LogChanges('file')
-  async softDelete(id: number, client?: PoolClient) {
+  async softDelete(request: Request, id: number, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM files WHERE id = $1',
       [id]

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -9,6 +9,7 @@ import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { Request } from 'express';
 
 @Controller('organizations')
 @UseGuards(AuthenticatedGuard, RoleGuard)
@@ -31,29 +32,34 @@ export class OrganizationsController {
 
   @Post()
   async create(
+    @Req() request: Request,
     @Body(new JoiValidationPipe(createOrganizationSchema))
     createOrganizationDto: CreateOrganizationDto,
   ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.organizationsService.create(createOrganizationDto, client);
+      return this.organizationsService.create(request, createOrganizationDto, client);
     });
   }
 
   @Delete(':id')
-  async softDelete(@Param('id', ParseIntPipe) id: number) {
+  async softDelete(
+    @Req() request: Request,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.organizationsService.softDelete(id, client);
+      return this.organizationsService.softDelete(request, id, client);
     });
   }
 
   @Put(':id')
   async update(
+    @Req() request: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(updateOrganizationSchema))
     updateOrganizationDto: UpdateOrganizationDto,
   ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.organizationsService.update(id, updateOrganizationDto, client);
+      return this.organizationsService.update(request, id, updateOrganizationDto, client);
     });
   }
 }

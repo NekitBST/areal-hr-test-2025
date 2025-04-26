@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -9,6 +9,7 @@ import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { Request } from 'express';
 
 @Controller('employees')
 @UseGuards(AuthenticatedGuard, RoleGuard)
@@ -31,29 +32,34 @@ export class EmployeesController {
 
   @Post()
   async create(
+    @Req() request: Request,
     @Body(new JoiValidationPipe(createEmployeeSchema))
     createEmployeeDto: CreateEmployeeDto,
   ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.employeesService.create(createEmployeeDto, client);
+      return this.employeesService.create(request, createEmployeeDto, client);
     });
   }
 
   @Delete(':id')
-  async softDelete(@Param('id', ParseIntPipe) id: number) {
+  async softDelete(
+    @Req() request: Request,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.employeesService.softDelete(id, client);
+      return this.employeesService.softDelete(request, id, client);
     });
   }
 
   @Put(':id')
   async update(
+    @Req() request: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(updateEmployeeSchema))
     updateEmployeeDto: UpdateEmployeeDto,
   ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.employeesService.update(id, updateEmployeeDto, client);
+      return this.employeesService.update(request, id, updateEmployeeDto, client);
     });
   }
 } 

@@ -5,6 +5,7 @@ import { UpdatePositionDto } from './dto/update-position.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
+import { Request } from 'express';
 
 @Injectable()
 export class PositionsService {
@@ -34,7 +35,7 @@ export class PositionsService {
   }
 
   @LogChanges('position')
-  async create(createPositionDto: CreatePositionDto, client?: PoolClient) {
+  async create(request: Request, createPositionDto: CreatePositionDto, client?: PoolClient) {
     const { name } = createPositionDto;
     const result = await (client || this.dbService).query(
       'INSERT INTO positions (name) ' +
@@ -46,7 +47,7 @@ export class PositionsService {
   }
 
   @LogChanges('position')
-  async softDelete(id: number, client?: PoolClient) {
+  async softDelete(request: Request, id: number, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM positions WHERE id = $1',
       [id]
@@ -71,7 +72,7 @@ export class PositionsService {
   }
 
   @LogChanges('position')
-  async update(id: number, updatePositionDto: UpdatePositionDto, client?: PoolClient) {
+  async update(request: Request, id: number, updatePositionDto: UpdatePositionDto, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM positions WHERE id = $1',
       [id]

@@ -43,7 +43,7 @@ export class HrOperationsService {
   }
 
   @LogChanges('hr_operation')
-  async create(createHrOperationDto: CreateHrOperationDto, client?: PoolClient) {
+  async create(request: Request, createHrOperationDto: CreateHrOperationDto, client?: PoolClient) {
     const { employee_id, department_id, position_id, salary, action } = createHrOperationDto;
     
     const result = await (client || this.dbService).query(
@@ -72,7 +72,7 @@ export class HrOperationsService {
   }
 
   @LogChanges('hr_operation')
-  async update(id: number, updateHrOperationDto: UpdateHrOperationDto, client?: PoolClient) {
+  async update(request: Request, id: number, updateHrOperationDto: UpdateHrOperationDto, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM hr_operations WHERE id = $1',
       [id]
@@ -106,7 +106,7 @@ export class HrOperationsService {
   }
 
   @LogChanges('hr_operation')
-  async softDelete(id: number, client?: PoolClient) {
+  async softDelete(request: Request, id: number, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM hr_operations WHERE id = $1',
       [id]

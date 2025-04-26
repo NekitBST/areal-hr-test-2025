@@ -6,6 +6,7 @@ import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
 import * as argon2 from 'argon2';
+import { Request } from 'express';
 
 @Injectable()
 export class UsersService {
@@ -42,7 +43,7 @@ export class UsersService {
   }
 
   @LogChanges('user')
-  async create(createUserDto: CreateUserDto, client?: PoolClient) {
+  async create(request: Request, createUserDto: CreateUserDto, client?: PoolClient) {
     const { last_name, first_name, middle_name, login, password, role_id } = createUserDto;
 
     const checkLogin = await (client || this.dbService).query(
@@ -78,7 +79,7 @@ export class UsersService {
   }
 
   @LogChanges('user')
-  async update(id: number, updateUserDto: UpdateUserDto, client?: PoolClient) {
+  async update(request: Request, id: number, updateUserDto: UpdateUserDto, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM users WHERE id = $1',
       [id]
@@ -140,7 +141,7 @@ export class UsersService {
   }
 
   @LogChanges('user')
-  async softDelete(id: number, client?: PoolClient) {
+  async softDelete(request: Request, id: number, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM users WHERE id = $1',
       [id]

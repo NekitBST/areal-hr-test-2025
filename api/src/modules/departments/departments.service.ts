@@ -5,6 +5,7 @@ import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
+import { Request } from 'express';
 
 @Injectable()
 export class DepartmentsService {
@@ -34,7 +35,7 @@ export class DepartmentsService {
   }
 
   @LogChanges('department')
-  async create(createDepartmentDto: CreateDepartmentDto, client?: PoolClient) {
+  async create(request: Request, createDepartmentDto: CreateDepartmentDto, client?: PoolClient) {
     const { name, organization_id, parent_id, comment } = createDepartmentDto;
 
     const result = await (client || this.dbService).query(
@@ -48,7 +49,7 @@ export class DepartmentsService {
   }
 
   @LogChanges('department')
-  async update(id: number, updateDepartmentDto: UpdateDepartmentDto, client?: PoolClient) {
+  async update(request: Request, id: number, updateDepartmentDto: UpdateDepartmentDto, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM departments WHERE id = $1',
       [id]
@@ -82,7 +83,7 @@ export class DepartmentsService {
   }
 
   @LogChanges('department')
-  async softDelete(id: number, client?: PoolClient) {
+  async softDelete(request: Request, id: number, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM departments WHERE id = $1',
       [id]

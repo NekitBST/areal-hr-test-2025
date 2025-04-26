@@ -5,6 +5,7 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
+import { Request } from 'express';
 
 @Injectable()
 export class EmployeesService {
@@ -63,7 +64,7 @@ export class EmployeesService {
   }
 
   @LogChanges('employee')
-  async create(createEmployeeDto: CreateEmployeeDto, client?: PoolClient) {
+  async create(request: Request, createEmployeeDto: CreateEmployeeDto, client?: PoolClient) {
     const {
       last_name, first_name, middle_name, date_of_birth,
       passport_series, passport_number, passport_issue_date,
@@ -95,7 +96,7 @@ export class EmployeesService {
   }
 
   @LogChanges('employee')
-  async update(id: number, updateEmployeeDto: UpdateEmployeeDto, client?: PoolClient) {
+  async update(request: Request, id: number, updateEmployeeDto: UpdateEmployeeDto, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM employees WHERE id = $1',
       [id]
@@ -131,7 +132,7 @@ export class EmployeesService {
   }
 
   @LogChanges('employee')
-  async softDelete(id: number, client?: PoolClient) {
+  async softDelete(request: Request, id: number, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
       'SELECT deleted_at FROM employees WHERE id = $1',
       [id]

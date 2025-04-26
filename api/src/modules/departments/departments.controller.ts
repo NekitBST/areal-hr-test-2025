@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
@@ -9,6 +9,7 @@ import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { Request } from 'express';
 
 @Controller('departments')
 @UseGuards(AuthenticatedGuard, RoleGuard)
@@ -31,29 +32,34 @@ export class DepartmentsController {
 
   @Post()
   async create(
+    @Req() request: Request,
     @Body(new JoiValidationPipe(createDepartmentSchema))
     createDepartmentDto: CreateDepartmentDto,
   ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.departmentsService.create(createDepartmentDto, client);
+      return this.departmentsService.create(request, createDepartmentDto, client);
     });
   }
 
   @Delete(':id')
-  async softDelete(@Param('id', ParseIntPipe) id: number) {
+  async softDelete(
+    @Req() request: Request,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.departmentsService.softDelete(id, client);
+      return this.departmentsService.softDelete(request, id, client);
     });
   }
 
   @Put(':id')
   async update(
+    @Req() request: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(updateDepartmentSchema))
     updateDepartmentDto: UpdateDepartmentDto,
   ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.departmentsService.update(id, updateDepartmentDto, client);
+      return this.departmentsService.update(request, id, updateDepartmentDto, client);
     });
   }
 }

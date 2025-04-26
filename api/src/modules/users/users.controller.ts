@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,6 +9,7 @@ import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import { Roles } from '../auth/decorators/role.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { Request } from 'express';
 
 @Controller('users')
 @UseGuards(AuthenticatedGuard, RoleGuard)
@@ -31,29 +32,33 @@ export class UsersController {
 
   @Post()
   async create(
+    @Req() request: Request,
     @Body(new JoiValidationPipe(createUserSchema))
     createUserDto: CreateUserDto,
   ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.usersService.create(createUserDto, client);
+      return this.usersService.create(request, createUserDto, client);
     });
   }
 
   @Delete(':id')
-  async softDelete(@Param('id', ParseIntPipe) id: number) {
+  async softDelete(@Req() request: Request, 
+    @Param('id', ParseIntPipe) id: number
+  ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.usersService.softDelete(id, client);
+      return this.usersService.softDelete(request, id, client);
     });
   }
 
   @Put(':id')
   async update(
+    @Req() request: Request,
     @Param('id', ParseIntPipe) id: number,
     @Body(new JoiValidationPipe(updateUserSchema))
     updateUserDto: UpdateUserDto,
   ) {
     return this.dbService.withTransaction(async (client) => {
-      return this.usersService.update(id, updateUserDto, client);
+      return this.usersService.update(request, id, updateUserDto, client);
     });
   }
 } 
