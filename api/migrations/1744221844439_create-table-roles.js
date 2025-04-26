@@ -9,6 +9,12 @@ exports.up = pgm => {
       unique: true 
     }
   });
+
+  pgm.sql(`
+    INSERT INTO roles (name) VALUES 
+    ('Администратор'),
+    ('Менеджер по персоналу');
+  `);
 };
 
 exports.down = pgm => {

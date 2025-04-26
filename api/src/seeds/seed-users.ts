@@ -2,7 +2,6 @@ import { DatabaseService } from '../common/services/database.service';
 import * as argon2 from 'argon2';
 
 export async function seedUsers(dbService: DatabaseService) {
-  await dbService.query('TRUNCATE users CASCADE');
 
   const rolesResult = await dbService.query(
     'SELECT id, name FROM roles WHERE name IN ($1, $2)',

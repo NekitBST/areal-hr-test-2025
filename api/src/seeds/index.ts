@@ -1,5 +1,4 @@
 import { DatabaseService } from '../common/services/database.service';
-import { seedRoles } from './seed-roles';
 import { seedUsers } from './seed-users';
 import { seedOrganizations } from './seed-organizations';
 import { seedDepartments } from './seed-departments';
@@ -14,7 +13,6 @@ export async function seed() {
   try {
     console.log('Начало заполнения базы данных тестовыми данными...');
 
-    await seedRoles(dbService);
     await seedUsers(dbService);
     await seedOrganizations(dbService);
     await seedDepartments(dbService);
