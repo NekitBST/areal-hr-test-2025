@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./api
+      dockerfile: ../containers/api/Dockerfile
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=5432
+      - DB_HOST=postgres
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - ADMIN_LOGIN=${ADMIN_LOGIN}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    build:
+      context: ./app
+      dockerfile: ../containers/app/Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_DB_HOST=${VITE_DB_HOST}
+      - VITE_PORT=${VITE_PORT}
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
