@@ -143,7 +143,9 @@ export class UsersService {
   @LogChanges('user')
   async softDelete(request: Request, id: number, client?: PoolClient) {
     const checkResult = await (client || this.dbService).query(
-      'SELECT deleted_at FROM users WHERE id = $1',
+      'SELECT u.deleted_at, u.login, r.name as role_name FROM users u ' +
+      'JOIN roles r ON u.role_id = r.id ' +
+      'WHERE u.id = $1',
       [id]
     );
 
@@ -153,6 +155,19 @@ export class UsersService {
 
     if (checkResult.rows[0].deleted_at !== null) {
       throw new BadRequestException(`Пользователь с ID ${id} уже удален`);
+    }
+
+    if (checkResult.rows[0].role_name === 'Администратор') {
+      const adminCount = await (client || this.dbService).query(
+        'SELECT COUNT(*) FROM users u ' +
+        'JOIN roles r ON u.role_id = r.id ' +
+        'WHERE r.name = $1 AND u.deleted_at IS NULL',
+        ['Администратор']
+      );
+
+      if (adminCount.rows[0].count === '1') {
+        throw new BadRequestException('Невозможно удалить последнего администратора');
+      }
     }
 
     const result = await (client || this.dbService).query(
