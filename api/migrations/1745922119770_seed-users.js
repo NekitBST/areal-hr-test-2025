@@ -1,9 +1,7 @@
-import { DatabaseService } from '../common/services/database.service';
-import * as argon2 from 'argon2';
+const argon2 = require('argon2');
 
-export async function seedUsers(dbService: DatabaseService) {
-
-  const rolesResult = await dbService.query(
+exports.up = async (pgm) => {
+  const rolesResult = await pgm.db.query(
     'SELECT id, name FROM roles WHERE name IN ($1, $2)',
     ['Администратор', 'Менеджер по персоналу']
   );
@@ -40,12 +38,14 @@ export async function seedUsers(dbService: DatabaseService) {
       parallelism: 4
     });
 
-    await dbService.query(
+    await pgm.db.query(
       'INSERT INTO users (last_name, first_name, middle_name, login, password_hash, role_id) ' +
       'VALUES ($1, $2, $3, $4, $5, $6)',
       [user.last_name, user.first_name, user.middle_name, user.login, password_hash, user.role_id]
     );
   }
+};
 
-  console.log('Пользователи созданы');
-} 
+exports.down = (pgm) => {
+  pgm.db.query('TRUNCATE users CASCADE');
+};

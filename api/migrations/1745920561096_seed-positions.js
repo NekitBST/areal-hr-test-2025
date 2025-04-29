@@ -1,8 +1,4 @@
-import { DatabaseService } from '../common/services/database.service';
-
-export async function seedPositions(dbService: DatabaseService) {
-  await dbService.query('TRUNCATE positions CASCADE');
-
+exports.up = (pgm) => {
   const positions = [
     { name: 'Ведущий разработчик' },
     { name: 'Frontend разработчик' },
@@ -11,11 +7,13 @@ export async function seedPositions(dbService: DatabaseService) {
   ];
 
   for (const position of positions) {
-    await dbService.query(
+    pgm.db.query(
       'INSERT INTO positions (name) VALUES ($1)',
       [position.name]
     );
   }
+};
 
-  console.log('Должности созданы');
-} 
+exports.down = (pgm) => {
+  pgm.db.query('TRUNCATE positions CASCADE');
+}; 

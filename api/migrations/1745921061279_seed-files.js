@@ -1,16 +1,13 @@
-import { DatabaseService } from '../common/services/database.service';
-import * as fs from 'fs';
-import * as path from 'path';
+const fs = require('fs');
+const path = require('path');
 
-export async function seedFiles(dbService: DatabaseService) {
-  await dbService.query('TRUNCATE files CASCADE');
-
+exports.up = async (pgm) => {
   const filesDir = path.join(process.cwd(), 'files');
   if (!fs.existsSync(filesDir)) {
     fs.mkdirSync(filesDir);
   }
 
-  const employeesResult = await dbService.query('SELECT id FROM employees LIMIT 4');
+  const employeesResult = await pgm.db.query('SELECT id FROM employees LIMIT 4');
   const employees = employeesResult.rows;
 
   const files = [
@@ -41,11 +38,23 @@ export async function seedFiles(dbService: DatabaseService) {
     const filePath = path.join(filesDir, fileName);
     fs.writeFileSync(filePath, file.content);
 
-    await dbService.query(
+    await pgm.db.query(
       'INSERT INTO files (name, file_path, employee_id) VALUES ($1, $2, $3)',
       [file.name, fileName, file.employee_id]
     );
   }
+};
 
-  console.log('Файлы созданы');
-} 
+exports.down = async (pgm) => {
+  const filesDir = path.join(process.cwd(), 'files');
+  if (fs.existsSync(filesDir)) {
+    const files = await pgm.db.query('SELECT file_path FROM files');
+    for (const file of files.rows) {
+      const filePath = path.join(filesDir, file.file_path);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+  }
+  pgm.db.query('TRUNCATE files CASCADE');
+};

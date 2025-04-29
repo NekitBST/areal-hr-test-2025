@@ -1,9 +1,5 @@
-import { DatabaseService } from '../common/services/database.service';
-
-export async function seedDepartments(dbService: DatabaseService) {
-  await dbService.query('TRUNCATE departments CASCADE');
-
-  const orgResult = await dbService.query(
+exports.up = async (pgm) => {
+  const orgResult = await pgm.db.query(
     'SELECT id FROM organizations LIMIT 1'
   );
   const organizationId = orgResult.rows[0].id;
@@ -38,7 +34,7 @@ export async function seedDepartments(dbService: DatabaseService) {
   const departmentIds = {};
   
   for (const dept of departments) {
-    const result = await dbService.query(
+    const result = await pgm.db.query(
       'INSERT INTO departments (name, organization_id, parent_id, comment) VALUES ($1, $2, $3, $4) RETURNING id',
       [dept.name, dept.organization_id, dept.parent_id, dept.comment]
     );
@@ -46,10 +42,12 @@ export async function seedDepartments(dbService: DatabaseService) {
   }
 
   const parentId = departmentIds['Отдел разработки'];
-  await dbService.query(
+  await pgm.db.query(
     'UPDATE departments SET parent_id = $1 WHERE name IN ($2, $3, $4)',
     [parentId, 'Frontend отдел', 'Backend отдел', 'QA отдел']
   );
+};
 
-  console.log('Отделы созданы');
-} 
+exports.down = (pgm) => {
+  pgm.db.query('TRUNCATE departments CASCADE');
+}; 

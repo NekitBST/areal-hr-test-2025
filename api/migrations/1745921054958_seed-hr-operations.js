@@ -1,11 +1,7 @@
-import { DatabaseService } from '../common/services/database.service';
-
-export async function seedHrOperations(dbService: DatabaseService) {
-  await dbService.query('TRUNCATE hr_operations CASCADE');
-
-  const employeesResult = await dbService.query('SELECT id FROM employees LIMIT 4');
-  const departmentsResult = await dbService.query('SELECT id FROM departments LIMIT 4');
-  const positionsResult = await dbService.query('SELECT id FROM positions LIMIT 4');
+exports.up = async (pgm) => {
+  const employeesResult = await pgm.db.query('SELECT id FROM employees LIMIT 4');
+  const departmentsResult = await pgm.db.query('SELECT id FROM departments LIMIT 4');
+  const positionsResult = await pgm.db.query('SELECT id FROM positions LIMIT 4');
 
   const employees = employeesResult.rows;
   const departments = departmentsResult.rows;
@@ -47,7 +43,7 @@ export async function seedHrOperations(dbService: DatabaseService) {
   ];
 
   for (const operation of hrOperations) {
-    await dbService.query(
+    await pgm.db.query(
       `INSERT INTO hr_operations (
         employee_id, department_id, position_id,
         salary, action, action_date
@@ -62,6 +58,8 @@ export async function seedHrOperations(dbService: DatabaseService) {
       ]
     );
   }
+};
 
-  console.log('HR операции созданы');
-} 
+exports.down = (pgm) => {
+  pgm.db.query('TRUNCATE hr_operations CASCADE');
+}; 

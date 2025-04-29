@@ -1,8 +1,4 @@
-import { DatabaseService } from '../common/services/database.service';
-
-export async function seedOrganizations(dbService: DatabaseService) {
-  await dbService.query('TRUNCATE organizations CASCADE');
-
+exports.up = (pgm) => {
   const organizations = [
     {
       name: 'ООО "Технологии будущего"',
@@ -23,11 +19,13 @@ export async function seedOrganizations(dbService: DatabaseService) {
   ];
 
   for (const org of organizations) {
-    await dbService.query(
+    pgm.db.query(
       'INSERT INTO organizations (name, comment) VALUES ($1, $2)',
       [org.name, org.comment]
     );
   }
+};
 
-  console.log('Организации созданы');
-} 
+exports.down = (pgm) => {
+  pgm.db.query('TRUNCATE organizations CASCADE');
+};

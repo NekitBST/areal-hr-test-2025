@@ -1,8 +1,4 @@
-import { DatabaseService } from '../common/services/database.service';
-
-export async function seedEmployees(dbService: DatabaseService) {
-  await dbService.query('TRUNCATE employees CASCADE');
-
+exports.up = (pgm) => {
   const employees = [
     {
       last_name: 'Иванов',
@@ -75,7 +71,7 @@ export async function seedEmployees(dbService: DatabaseService) {
   ];
 
   for (const employee of employees) {
-    await dbService.query(
+    pgm.db.query(
       `INSERT INTO employees (
         last_name, first_name, middle_name, date_of_birth,
         passport_series, passport_number, passport_issue_date,
@@ -102,6 +98,8 @@ export async function seedEmployees(dbService: DatabaseService) {
       ]
     );
   }
+};
 
-  console.log('Сотрудники созданы');
-} 
+exports.down = (pgm) => {
+  pgm.db.query('TRUNCATE employees CASCADE');
+}; 
