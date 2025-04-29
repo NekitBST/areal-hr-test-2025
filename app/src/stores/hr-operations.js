@@ -9,6 +9,15 @@ export const useHrOperationsStore = defineStore('hrOperations', {
     hrOperationDetails: null
   }),
 
+  getters: {
+    getLastEmployeeOperation: (state) => (employeeId) => {
+      const employeeOperations = state.hrOperations
+        .filter(op => op.employee_id === employeeId)
+        .sort((a, b) => new Date(b.action_date) - new Date(a.action_date));
+      return employeeOperations[0] || null;
+    }
+  },
+
   actions: {
     async fetchHrOperations() {
       this.loading = true

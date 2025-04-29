@@ -19,6 +19,7 @@
     />
 
     <UIDropdown
+      v-if="showField.department"
       id="department_id"
       v-model="formData.department_id"
       :options="departments"
@@ -31,6 +32,7 @@
     />
 
     <UIDropdown
+      v-if="showField.position"
       id="position_id"
       v-model="formData.position_id"
       :options="positions"
@@ -53,6 +55,7 @@
     />
 
     <UIInput
+      v-if="showField.salary"
       id="salary"
       v-model="formData.salary"
       type="number"
@@ -79,6 +82,7 @@
 import { reactive, watch, computed } from 'vue'
 import Dialog from 'primevue/dialog'
 import { UIInput, UIDropdown, UIButton } from '../UI/ui-components'
+import { useHrOperationsStore } from '../../stores/hr-operations'
 
 const props = defineProps({
   visible: {
@@ -118,12 +122,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'save', 'cancel'])
 
-const actions = [
-  'Прием на работу',
-  'Увольнение',
-  'Перевод',
-  'Изменение зарплаты'
-]
+const hrOperationsStore = useHrOperationsStore()
 
 const formData = reactive({
   employee_id: null,
@@ -132,6 +131,38 @@ const formData = reactive({
   action: '',
   salary: null
 })
+
+const availableActions = computed(() => {
+  if (props.mode === 'edit' && props.hrOperation?.action) {
+    return [props.hrOperation.action]
+  }
+
+  if (!formData.employee_id) return ['Прием на работу']
+  
+  const lastOperation = hrOperationsStore.getLastEmployeeOperation(formData.employee_id)
+  if (!lastOperation) return ['Прием на работу']
+  
+  if (lastOperation.action === 'Увольнение') {
+    return ['Прием на работу']
+  }
+  
+  if (lastOperation.action === 'Прием на работу' || 
+      lastOperation.action === 'Перевод' || 
+      lastOperation.action === 'Изменение зарплаты') {
+    return ['Увольнение', 'Перевод', 'Изменение зарплаты']
+  }
+  
+  return ['Прием на работу']
+})
+
+const showField = computed(() => ({
+  employee: true,
+  department: formData.action !== 'Увольнение' && formData.action !== 'Изменение зарплаты',
+  position: formData.action !== 'Увольнение' && formData.action !== 'Изменение зарплаты',
+  salary: ['Прием на работу', 'Перевод', 'Изменение зарплаты'].includes(formData.action)
+}))
+
+const actions = computed(() => availableActions.value)
 
 watch(() => props.hrOperation, (newVal) => {
   if (newVal) {
@@ -153,8 +184,45 @@ watch(() => props.visible, (newVal) => {
   }
 })
 
+watch(() => formData.employee_id, (newVal) => {
+  if (newVal) {
+    const lastOperation = hrOperationsStore.getLastEmployeeOperation(newVal)
+    if (lastOperation && lastOperation.action === 'Увольнение') {
+      formData.action = 'Прием на работу'
+    } else if (!lastOperation) {
+      formData.action = 'Прием на работу'
+    }
+
+    if (lastOperation && lastOperation.action !== 'Увольнение') {
+      formData.department_id = lastOperation.department_id
+      formData.position_id = lastOperation.position_id
+      formData.salary = lastOperation.salary
+    }
+  }
+})
+
+watch(() => formData.action, (newVal) => {
+  if (newVal === 'Изменение зарплаты') {
+    const lastOperation = hrOperationsStore.getLastEmployeeOperation(formData.employee_id)
+    if (lastOperation && lastOperation.action !== 'Увольнение') {
+      formData.department_id = lastOperation.department_id
+      formData.position_id = lastOperation.position_id
+    }
+  }
+})
+
 const onSave = () => {
-  emit('save', { ...formData })
+  const dataToSave = { ...formData }
+  
+  if (formData.action === 'Изменение зарплаты' && (!formData.department_id || !formData.position_id)) {
+    const lastOperation = hrOperationsStore.getLastEmployeeOperation(formData.employee_id)
+    if (lastOperation && lastOperation.action !== 'Увольнение') {
+      dataToSave.department_id = lastOperation.department_id
+      dataToSave.position_id = lastOperation.position_id
+    }
+  }
+
+  emit('save', dataToSave)
 }
 
 const onCancel = () => {
