@@ -8,6 +8,24 @@ interface RequestWithUser extends Request {
   };
 }
 
+const sensitiveFields = {
+  user: ['password_hash']
+};
+
+const removeSensitiveData = (objectType: string, data: Record<string, any> | null): Record<string, any> | null => {
+  if (!data) return null;
+  
+  const fieldsToRemove = sensitiveFields[objectType] || [];
+  if (fieldsToRemove.length === 0) return data;
+
+  const filteredData = { ...data };
+  fieldsToRemove.forEach(field => {
+    delete filteredData[field];
+  });
+  
+  return filteredData;
+};
+
 export function LogChanges(objectType: string) {
   return function (
     target: any,
@@ -54,6 +72,9 @@ export function LogChanges(objectType: string) {
           }
         }
 
+        const filteredOldValue = removeSensitiveData(objectType, oldValue);
+        const filteredNewValue = removeSensitiveData(objectType, newValue);
+
         await transactionClient.query(
           `INSERT INTO change_history (
             changed_by,
@@ -67,8 +88,8 @@ export function LogChanges(objectType: string) {
             userId,
             objectType,
             result.id,
-            oldValue ? JSON.stringify(oldValue) : null,
-            JSON.stringify(newValue),
+            filteredOldValue ? JSON.stringify(filteredOldValue) : null,
+            JSON.stringify(filteredNewValue),
           ]
         );
 
