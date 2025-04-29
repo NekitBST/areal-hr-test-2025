@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseInterceptors, UploadedFile, UseGuards, Req } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
 import { FilesService } from './files.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
@@ -35,7 +35,7 @@ export class FilesController {
   @Post()
   @UseInterceptors(FileInterceptor('file_path', {
     storage: diskStorage({
-      destination: './files',
+      destination: join(process.cwd(), '..', 'files'),
       filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
@@ -53,7 +53,7 @@ export class FilesController {
     @UploadedFile() file,
     @Body(new JoiValidationPipe(createFileSchema)) createFileDto: CreateFileDto,
   ) {
-    createFileDto.file_path = file.path.replace(/\\/g, '/');
+    createFileDto.file_path = join('files', file.filename).replace(/\\/g, '/');
     return this.dbService.withTransaction(async (client) => {
       return this.filesService.create(request, createFileDto, client);
     });
@@ -62,7 +62,7 @@ export class FilesController {
   @Put(':id')
   @UseInterceptors(FileInterceptor('file_path', {
     storage: diskStorage({
-      destination: './files',
+      destination: join(process.cwd(), '..', 'files'),
       filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, file.fieldname + '-' + uniqueSuffix + extname(file.originalname));
@@ -82,7 +82,7 @@ export class FilesController {
     @Body(new JoiValidationPipe(updateFileSchema)) updateFileDto: UpdateFileDto,
   ) {
     if (file) {
-      updateFileDto.file_path = file.path.replace(/\\/g, '/');
+      updateFileDto.file_path = join('files', file.filename).replace(/\\/g, '/');
     }
     return this.dbService.withTransaction(async (client) => {
       return this.filesService.update(request, id, updateFileDto, client);

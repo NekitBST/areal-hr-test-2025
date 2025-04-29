@@ -30,7 +30,7 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  app.useStaticAssets(join(__dirname, '..', 'files'), {
+  app.useStaticAssets(join(process.cwd(), '..', 'files'), {
     prefix: '/files/',
   });
 

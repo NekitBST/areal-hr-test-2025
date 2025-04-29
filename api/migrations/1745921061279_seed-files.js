@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 exports.up = async (pgm) => {
-  const filesDir = path.join(process.cwd(), 'files');
+  const filesDir = path.join(process.cwd(), '..', 'files');
   if (!fs.existsSync(filesDir)) {
     fs.mkdirSync(filesDir);
   }
@@ -46,7 +46,7 @@ exports.up = async (pgm) => {
 };
 
 exports.down = async (pgm) => {
-  const filesDir = path.join(process.cwd(), 'files');
+  const filesDir = path.join(process.cwd(), '..', 'files');
   if (fs.existsSync(filesDir)) {
     const files = await pgm.db.query('SELECT file_path FROM files');
     for (const file of files.rows) {
