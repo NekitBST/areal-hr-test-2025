@@ -133,8 +133,11 @@ const formData = reactive({
 })
 
 const availableActions = computed(() => {
-  if (props.mode === 'edit' && props.hrOperation?.action) {
-    return [props.hrOperation.action]
+  if (props.mode === 'edit') {
+    const currentAction = props.hrOperation?.action
+    if (currentAction) {
+      return [currentAction]
+    }
   }
 
   if (!formData.employee_id) return ['Прием на работу']
@@ -169,7 +172,7 @@ watch(() => props.hrOperation, (newVal) => {
     formData.employee_id = newVal.employee_id
     formData.department_id = newVal.department_id
     formData.position_id = newVal.position_id
-    formData.action = newVal.action || ''
+    formData.action = newVal.action
     formData.salary = newVal.salary
   }
 }, { immediate: true })
@@ -185,7 +188,7 @@ watch(() => props.visible, (newVal) => {
 })
 
 watch(() => formData.employee_id, (newVal) => {
-  if (newVal) {
+  if (props.mode === 'create' && newVal) {
     const lastOperation = hrOperationsStore.getLastEmployeeOperation(newVal)
     if (lastOperation && lastOperation.action === 'Увольнение') {
       formData.action = 'Прием на работу'

@@ -10,7 +10,16 @@
     selectionMode="single"
     @row-select="onRowSelect"
     @row-unselect="onRowUnselect"
+    :rowClass="getRowClass"
+    v-bind="$attrs"
   >
+    <template #row="{ data }">
+      <tr :class="{ 'dismissed-employee': employeesStore.isEmployeeDismissed(data.id) }">
+        <td v-for="col of $slots.default()" :key="col.key">
+          <component :is="col" :data="data" />
+        </td>
+      </tr>
+    </template>
     <Column field="id" header="ID" sortable />
     <Column field="last_name" header="Фамилия" sortable>
       <template #body="{ data }">
@@ -74,10 +83,15 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { onMounted } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { UIButton } from '../UI/ui-components'
+import { useEmployeesStore } from '../../stores/employees'
+import { useHrOperationsStore } from '../../stores/hr-operations'
+
+const employeesStore = useEmployeesStore()
+const hrOperationsStore = useHrOperationsStore()
 
 const props = defineProps({
   employees: {
@@ -96,6 +110,12 @@ const props = defineProps({
 
 const emit = defineEmits(['update:selectedEmployee', 'row-select', 'row-unselect', 'view', 'edit', 'delete'])
 
+const getRowClass = (data) => {
+  return {
+    'dismissed-employee': employeesStore.isEmployeeDismissed(data.id)
+  }
+}
+
 const onRowSelect = (event) => {
   emit('row-select', event)
 }
@@ -103,4 +123,8 @@ const onRowSelect = (event) => {
 const onRowUnselect = () => {
   emit('row-unselect')
 }
-</script> 
+
+onMounted(async () => {
+  await hrOperationsStore.fetchHrOperations()
+})
+</script>

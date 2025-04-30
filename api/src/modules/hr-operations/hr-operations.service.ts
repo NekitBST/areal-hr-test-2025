@@ -12,13 +12,11 @@ export class HrOperationsService {
 
   async findAll() {
     const result = await this.dbService.query(
-      'SELECT ho.id, ho.employee_id, ho.department_id, ho.position_id, ho.salary, ho.action, ' +
-      'ho.action_date, ho.created_at, ho.updated_at, ' +
-      'e.last_name, e.first_name ' +
-      'FROM hr_operations ho ' +
-      'LEFT JOIN employees e ON e.id = ho.employee_id ' +
-      'WHERE ho.deleted_at IS NULL ' +
-      'ORDER BY ho.id'
+      'SELECT id, employee_id, department_id, position_id, salary, action, ' +
+      'action_date, created_at, updated_at ' +
+      'FROM hr_operations ' +
+      'WHERE deleted_at IS NULL ' +
+      'ORDER BY id'
     );
 
     return result.rows;
@@ -26,12 +24,10 @@ export class HrOperationsService {
 
   async findOne(id: number) {
     const result = await this.dbService.query(
-      'SELECT ho.id, ho.employee_id, ho.department_id, ho.position_id, ho.salary, ho.action, ' +
-      'ho.action_date, ho.created_at, ho.updated_at, ' +
-      'e.last_name, e.first_name ' +
-      'FROM hr_operations ho ' +
-      'LEFT JOIN employees e ON e.id = ho.employee_id ' +
-      'WHERE ho.id = $1 AND ho.deleted_at IS NULL',
+      'SELECT id, employee_id, department_id, position_id, salary, action, ' +
+      'action_date, created_at, updated_at ' +
+      'FROM hr_operations ' +
+      'WHERE id = $1 AND deleted_at IS NULL',
       [id]
     );
 
@@ -53,14 +49,7 @@ export class HrOperationsService {
       [employee_id, department_id, position_id, salary, action]
     );
 
-    if (action === 'Увольнение') {
-      await (client || this.dbService).query(
-        'UPDATE employees SET deleted_at = CURRENT_TIMESTAMP ' +
-        'WHERE id = $1 AND deleted_at IS NULL',
-        [employee_id]
-      );
-    }
-    else if (['Прием на работу', 'Перевод', 'Изменение зарплаты'].includes(action)) {
+    if (['Прием на работу', 'Перевод', 'Изменение зарплаты', 'Увольнение'].includes(action)) {
       await (client || this.dbService).query(
         'UPDATE employees SET updated_at = CURRENT_TIMESTAMP ' +
         'WHERE id = $1',

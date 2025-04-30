@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { employeesApi } from '../services/api'
+import { useHrOperationsStore } from './hr-operations'
 
 export const useEmployeesStore = defineStore('employees', {
   state: () => ({
@@ -8,6 +9,14 @@ export const useEmployeesStore = defineStore('employees', {
     loading: false,
     employeeDetails: null
   }),
+
+  getters: {
+    isEmployeeDismissed: (state) => (employeeId) => {
+      const hrOperationsStore = useHrOperationsStore()
+      const lastOperation = hrOperationsStore.getLastEmployeeOperation(employeeId)
+      return lastOperation?.action === 'Увольнение'
+    }
+  },
 
   actions: {
     async fetchEmployees() {
