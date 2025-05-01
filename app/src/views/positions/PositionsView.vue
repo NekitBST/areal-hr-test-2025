@@ -17,6 +17,7 @@
       @view="viewDetails"
       @edit="openEditDialog"
       @delete="confirmDelete"
+      @sort="handleSort"
     />
 
     <PositionForm
@@ -60,10 +61,19 @@ const formErrors = reactive({
   name: ''
 })
 
+const sortField = ref('id')
+const sortOrder = ref('ASC')
+
 const positions = computed(() => store.positions)
 const loading = computed(() => store.loading)
 const detailsDialogVisible = ref(false)
 const positionDetails = computed(() => store.positionDetails)
+
+const handleSort = (event) => {
+  sortField.value = event.sortField
+  sortOrder.value = event.sortOrder === 1 ? 'ASC' : 'DESC'
+  store.fetchPositions({ sortField: sortField.value, sortOrder: sortOrder.value })
+}
 
 const openCreateDialog = () => {
   dialogMode.value = 'create'
@@ -178,6 +188,6 @@ const viewDetails = async (position) => {
 }
 
 onMounted(async () => {
-  await store.fetchPositions()
+  await store.fetchPositions({ sortField: sortField.value, sortOrder: sortOrder.value })
 })
 </script> 

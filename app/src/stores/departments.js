@@ -14,10 +14,10 @@ export const useDepartmentsStore = defineStore('departments', {
       this.selectedDepartment = department
     },
 
-    async fetchDepartments() {
+    async fetchDepartments(params = {}) {
       try {
         this.loading = true
-        const response = await departmentsApi.getAll()
+        const response = await departmentsApi.getAll(params)
         this.departments = response.data
       } catch (error) {
         throw error

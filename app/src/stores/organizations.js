@@ -10,10 +10,10 @@ export const useOrganizationsStore = defineStore('organizations', {
   }),
 
   actions: {
-    async fetchOrganizations() {
+    async fetchOrganizations(params = {}) {
       this.loading = true
       try {
-        const response = await organizationsApi.getAll()
+        const response = await organizationsApi.getAll(params)
         this.organizations = response.data
       } catch (error) {
         throw error

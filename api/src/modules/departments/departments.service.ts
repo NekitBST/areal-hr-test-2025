@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
+import { FindAllDepartmentsDto } from './dto/find-all-departments.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
@@ -11,10 +12,14 @@ import { Request } from 'express';
 export class DepartmentsService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(query: FindAllDepartmentsDto = {}) {
+    const sortField = query.sortField || 'id';
+    const sortOrder = query.sortOrder || 'ASC';
+
     const result = await this.dbService.query(
       'SELECT id, name, organization_id, parent_id, comment, created_at, updated_at ' +
-      'FROM departments WHERE deleted_at IS NULL ORDER BY id'
+      'FROM departments WHERE deleted_at IS NULL ' +
+      `ORDER BY ${sortField} ${sortOrder}`
     );
 
     return result.rows;

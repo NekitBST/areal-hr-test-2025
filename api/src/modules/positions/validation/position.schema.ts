@@ -24,4 +24,9 @@ export const updatePositionSchema = Joi.object({
     })
 }).min(1).messages({
   'object.min': 'Необходимо указать хотя бы одно поле для обновления'
+});
+
+export const findAllPositionsSchema = Joi.object({
+  sortField: Joi.string().valid('id', 'name', 'created_at', 'updated_at').default('id'),
+  sortOrder: Joi.string().valid('ASC', 'DESC').default('ASC')
 }); 

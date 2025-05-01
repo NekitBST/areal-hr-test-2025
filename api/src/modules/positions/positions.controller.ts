@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards, Req, Query } from '@nestjs/common';
 import { PositionsService } from './positions.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
+import { FindAllPositionsDto } from './dto/find-all-positions.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
-import { createPositionSchema, updatePositionSchema } from './validation/position.schema';
+import { createPositionSchema, updatePositionSchema, findAllPositionsSchema } from './validation/position.schema';
 import { DatabaseService } from '../../common/services/database.service';
 import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -21,8 +22,11 @@ export class PositionsController {
   ) {}
 
   @Get()
-  async findAll() {
-    return this.positionsService.findAll();
+  async findAll(
+    @Query(new JoiValidationPipe(findAllPositionsSchema))
+    query: FindAllPositionsDto,
+  ) {
+    return this.positionsService.findAll(query);
   }
 
   @Get(':id')

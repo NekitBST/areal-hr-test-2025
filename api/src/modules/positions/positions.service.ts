@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
+import { FindAllPositionsDto } from './dto/find-all-positions.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
@@ -11,10 +12,14 @@ import { Request } from 'express';
 export class PositionsService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(query: FindAllPositionsDto = {}) {
+    const sortField = query.sortField || 'id';
+    const sortOrder = query.sortOrder || 'ASC';
+
     const result = await this.dbService.query(
       'SELECT id, name, created_at, updated_at ' +
-      'FROM positions WHERE deleted_at IS NULL ORDER BY id'
+      'FROM positions WHERE deleted_at IS NULL ' +
+      `ORDER BY ${sortField} ${sortOrder}`
     );
 
     return result.rows;

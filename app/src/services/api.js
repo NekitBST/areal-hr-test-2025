@@ -33,7 +33,7 @@ api.interceptors.response.use(
 )
 
 export const organizationsApi = {
-  getAll: () => api.get('/organizations'),
+  getAll: (params = {}) => api.get('/organizations', { params }),
   getById: (id) => api.get(`/organizations/${id}`),
   create: (data) => api.post('/organizations', data),
   update: (id, data) => api.put(`/organizations/${id}`, data),
@@ -49,7 +49,7 @@ export const usersApi = {
 }
 
 export const positionsApi = {
-  getAll: () => api.get('/positions'),
+  getAll: (params = {}) => api.get('/positions', { params }),
   getById: (id) => api.get(`/positions/${id}`),
   create: (data) => api.post('/positions', data),
   update: (id, data) => api.put(`/positions/${id}`, data),
@@ -57,7 +57,7 @@ export const positionsApi = {
 }
 
 export const departmentsApi = {
-  getAll: () => api.get('/departments'),
+  getAll: (params = {}) => api.get('/departments', { params }),
   getById: (id) => api.get(`/departments/${id}`),
   create: (data) => api.post('/departments', data),
   update: (id, data) => api.put(`/departments/${id}`, data),

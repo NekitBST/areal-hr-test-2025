@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards, Req, Query } from '@nestjs/common';
 import { DepartmentsService } from './departments.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
+import { FindAllDepartmentsDto } from './dto/find-all-departments.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
-import { createDepartmentSchema, updateDepartmentSchema } from './validation/department.schema';
+import { createDepartmentSchema, updateDepartmentSchema, findAllDepartmentsSchema } from './validation/department.schema';
 import { DatabaseService } from '../../common/services/database.service';
 import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -21,8 +22,11 @@ export class DepartmentsController {
   ) {}
 
   @Get()
-  async findAll() {
-    return this.departmentsService.findAll();
+  async findAll(
+    @Query(new JoiValidationPipe(findAllDepartmentsSchema))
+    query: FindAllDepartmentsDto,
+  ) {
+    return this.departmentsService.findAll(query);
   }
 
   @Get(':id')

@@ -10,10 +10,10 @@ export const usePositionsStore = defineStore('positions', {
   }),
 
   actions: {
-    async fetchPositions() {
+    async fetchPositions(params = {}) {
       this.loading = true
       try {
-        const response = await positionsApi.getAll()
+        const response = await positionsApi.getAll(params)
         this.positions = response.data
       } catch (error) {
         throw error

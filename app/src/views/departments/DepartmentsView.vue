@@ -17,6 +17,7 @@
       @view="viewDetails"
       @edit="openEditDialog"
       @delete="confirmDelete"
+      @sort="handleSort"
     />
 
     <DepartmentForm
@@ -68,6 +69,15 @@ const formErrors = reactive({
   parent_id: '',
   comment: ''
 })
+
+const sortField = ref('id')
+const sortOrder = ref('ASC')
+
+const handleSort = (event) => {
+  sortField.value = event.sortField
+  sortOrder.value = event.sortOrder === 1 ? 'ASC' : 'DESC'
+  store.fetchDepartments({ sortField: sortField.value, sortOrder: sortOrder.value })
+}
 
 const departments = computed(() => store.departments)
 const organizations = computed(() => organizationsStore.organizations)
@@ -224,7 +234,7 @@ const viewDetails = async (department) => {
 
 onMounted(async () => {
   await Promise.all([
-    store.fetchDepartments(),
+    store.fetchDepartments({ sortField: sortField.value, sortOrder: sortOrder.value }),
     organizationsStore.fetchOrganizations()
   ])
 })

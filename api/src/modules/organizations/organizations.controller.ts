@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards, Req, Query } from '@nestjs/common';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { FindAllOrganizationsDto } from './dto/find-all-organizations.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
-import { createOrganizationSchema, updateOrganizationSchema } from './validation/organization.schema';
+import { createOrganizationSchema, updateOrganizationSchema, findAllOrganizationsSchema } from './validation/organization.schema';
 import { DatabaseService } from '../../common/services/database.service';
 import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -21,8 +22,11 @@ export class OrganizationsController {
   ) {}
 
   @Get()
-  async findAll() {
-    return this.organizationsService.findAll();
+  async findAll(
+    @Query(new JoiValidationPipe(findAllOrganizationsSchema))
+    query: FindAllOrganizationsDto,
+  ) {
+    return this.organizationsService.findAll(query);
   }
 
   @Get(':id')
