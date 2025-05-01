@@ -17,6 +17,7 @@
       @view="viewDetails"
       @edit="openEditDialog"
       @delete="confirmDelete"
+      @sort="handleSort"
     />
 
     <HrOperationForm
@@ -83,6 +84,9 @@ const positions = computed(() => positionsStore.positions)
 const loading = computed(() => store.loading)
 const detailsDialogVisible = ref(false)
 const hrOperationDetails = computed(() => store.hrOperationDetails)
+
+const sortField = ref('id')
+const sortOrder = ref('ASC')
 
 const openCreateDialog = () => {
   dialogMode.value = 'create'
@@ -206,9 +210,15 @@ const viewDetails = async (hrOperation) => {
   }
 }
 
+const handleSort = (event) => {
+  sortField.value = event.sortField
+  sortOrder.value = event.sortOrder === 1 ? 'ASC' : 'DESC'
+  store.fetchHrOperations({ sortField: sortField.value, sortOrder: sortOrder.value })
+}
+
 onMounted(async () => {
   await Promise.all([
-    store.fetchHrOperations(),
+    store.fetchHrOperations({ sortField: sortField.value, sortOrder: sortOrder.value }),
     employeesStore.fetchEmployees(),
     departmentsStore.fetchDepartments(),
     positionsStore.fetchPositions()

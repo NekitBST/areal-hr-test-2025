@@ -19,10 +19,10 @@ export const useHrOperationsStore = defineStore('hrOperations', {
   },
 
   actions: {
-    async fetchHrOperations() {
+    async fetchHrOperations(params = {}) {
       this.loading = true
       try {
-        const response = await hrOperationsApi.getAll()
+        const response = await hrOperationsApi.getAll(params)
         this.hrOperations = response.data
       } catch (error) {
         throw error

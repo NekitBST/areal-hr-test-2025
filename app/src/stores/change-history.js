@@ -10,10 +10,10 @@ export const useChangeHistoryStore = defineStore('changeHistory', {
   }),
 
   actions: {
-    async fetchChangeHistory() {
+    async fetchChangeHistory(params = {}) {
       this.loading = true
       try {
-        const response = await changeHistoryApi.getAll()
+        const response = await changeHistoryApi.getAll(params)
         this.changeHistory = response.data
       } catch (error) {
         throw error

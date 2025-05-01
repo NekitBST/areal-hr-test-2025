@@ -47,4 +47,12 @@ export const updateHrOperationSchema = Joi.object({
     .messages({
       'string.empty': 'Действие обязательно и не может быть пустым'
     })
-}); 
+});
+
+export const findAllHrOperationsSchema = Joi.object({
+  sortField: Joi.string().valid(
+    'id', 'employee_id', 'department_id', 'position_id', 
+    'salary', 'action', 'action_date', 'created_at', 'updated_at'
+  ).default('id'),
+  sortOrder: Joi.string().valid('ASC', 'DESC').default('ASC')
+});

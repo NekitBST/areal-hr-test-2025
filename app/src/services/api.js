@@ -81,7 +81,7 @@ export const filesApi = {
 }
 
 export const hrOperationsApi = {
-  getAll: () => api.get('/hr-operations'),
+  getAll: (params = {}) => api.get('/hr-operations', { params }),
   getById: (id) => api.get(`/hr-operations/${id}`),
   create: (data) => api.post('/hr-operations', data),
   update: (id, data) => api.put(`/hr-operations/${id}`, data),
@@ -89,7 +89,7 @@ export const hrOperationsApi = {
 }
 
 export const changeHistoryApi = {
-  getAll: () => api.get('/change-history'),
+  getAll: (params = {}) => api.get('/change-history', { params }),
   getById: (id) => api.get(`/change-history/${id}`)
 }
 

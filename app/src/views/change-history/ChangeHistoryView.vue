@@ -11,6 +11,7 @@
       @row-select="onRowSelect"
       @row-unselect="onRowUnselect"
       @view="viewDetails"
+      @sort="handleSort"
     />
 
     <ChangeHistoryDetails
@@ -32,6 +33,8 @@ const toast = useToast()
 
 const selectedChangeHistory = ref(null)
 const detailsDialogVisible = ref(false)
+const sortField = ref('id')
+const sortOrder = ref('ASC')
 
 const changeHistory = computed(() => store.changeHistory)
 const loading = computed(() => store.loading)
@@ -54,6 +57,12 @@ const onRowUnselect = () => {
   store.setSelectedChangeHistory(null)
 }
 
+const handleSort = (event) => {
+  sortField.value = event.sortField
+  sortOrder.value = event.sortOrder === 1 ? 'ASC' : 'DESC'
+  store.fetchChangeHistory({ sortField: sortField.value, sortOrder: sortOrder.value })
+}
+
 const viewDetails = async (changeHistory) => {
   try {
     await store.fetchChangeHistoryById(changeHistory.id)
@@ -65,7 +74,7 @@ const viewDetails = async (changeHistory) => {
 
 onMounted(async () => {
   try {
-    await store.fetchChangeHistory()
+    await store.fetchChangeHistory({ sortField: sortField.value, sortOrder: sortOrder.value })
   } catch (error) {
     showError(error)
   }

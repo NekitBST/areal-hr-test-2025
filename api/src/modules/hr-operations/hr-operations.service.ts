@@ -2,21 +2,26 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateHrOperationDto } from './dto/create-hr-operation.dto';
 import { UpdateHrOperationDto } from './dto/update-hr-operation.dto';
+import { FindAllHrOperationsDto } from './dto/find-all-hr-operations.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
+import { Request } from 'express';
 
 @Injectable()
 export class HrOperationsService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(params: FindAllHrOperationsDto = {}) {
+    const sortField = params.sortField || 'id';
+    const sortOrder = params.sortOrder || 'ASC';
+    
     const result = await this.dbService.query(
       'SELECT id, employee_id, department_id, position_id, salary, action, ' +
       'action_date, created_at, updated_at ' +
       'FROM hr_operations ' +
       'WHERE deleted_at IS NULL ' +
-      'ORDER BY id'
+      `ORDER BY ${sortField} ${sortOrder}`
     );
 
     return result.rows;
