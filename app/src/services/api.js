@@ -65,7 +65,7 @@ export const departmentsApi = {
 }
 
 export const employeesApi = {
-  getAll: () => api.get('/employees'),
+  getAll: (params = {}) => api.get('/employees', { params }),
   getById: (id) => api.get(`/employees/${id}`),
   create: (data) => api.post('/employees', data),
   update: (id, data) => api.put(`/employees/${id}`, data),
@@ -73,7 +73,7 @@ export const employeesApi = {
 }
 
 export const filesApi = {
-  getAll: () => api.get('/files'),
+  getAll: (params = {}) => api.get('/files', { params }),
   getById: (id) => api.get(`/files/${id}`),
   create: (formData) => api.post('/files', formData),
   update: (id, data) => api.put(`/files/${id}`, data),

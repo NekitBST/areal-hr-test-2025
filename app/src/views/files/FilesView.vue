@@ -14,6 +14,7 @@
       v-model:selectedFile="selectedFile"
       @row-select="onRowSelect"
       @row-unselect="onRowUnselect"
+      @sort="handleSort"
       @view="viewDetails"
       @edit="openEditDialog"
       @delete="confirmDelete"
@@ -72,6 +73,10 @@ const employees = computed(() =>
     full_name: `${emp.last_name} ${emp.first_name}`
   }))
 )
+
+const sortField = ref('id')
+const sortOrder = ref('ASC')
+
 const loading = computed(() => store.loading)
 const detailsDialogVisible = ref(false)
 const fileDetails = computed(() => store.fileDetails)
@@ -199,9 +204,15 @@ const viewDetails = async (file) => {
   }
 }
 
+const handleSort = (event) => {
+  sortField.value = event.sortField
+  sortOrder.value = event.sortOrder === 1 ? 'ASC' : 'DESC'
+  store.fetchFiles({ sortField: sortField.value, sortOrder: sortOrder.value })
+}
+
 onMounted(async () => {
   await Promise.all([
-    store.fetchFiles(),
+    store.fetchFiles({ sortField: sortField.value, sortOrder: sortOrder.value }),
     employeesStore.fetchEmployees()
   ])
 })

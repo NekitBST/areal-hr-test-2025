@@ -17,7 +17,7 @@
         <span>{{ data.name.length > 15 ? data.name.slice(0, 15) + '...' : data.name }}</span>
       </template>
     </Column>
-    <Column field="employee" header="Сотрудник" sortable>
+    <Column field="employee_id" header="Сотрудник" sortable>
       <template #body="{ data }">
         {{ getEmployeeFullName(data.employee_id) }}
       </template>

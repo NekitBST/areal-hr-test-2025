@@ -19,10 +19,10 @@ export const useEmployeesStore = defineStore('employees', {
   },
 
   actions: {
-    async fetchEmployees() {
+    async fetchEmployees(params = {}) {
       this.loading = true
       try {
-        const response = await employeesApi.getAll()
+        const response = await employeesApi.getAll(params)
         this.employees = response.data
       } catch (error) {
         throw error

@@ -242,4 +242,12 @@ export const updateEmployeeSchema = Joi.object({
     })
 }).min(1).messages({
   'object.min': 'Необходимо указать хотя бы одно поле для обновления'
+});
+
+export const findAllEmployeesSchema = Joi.object({
+  sortField: Joi.string().valid(
+    'id', 'last_name', 'first_name', 'middle_name', 'date_of_birth',
+    'department_name', 'position_name', 'salary', 'created_at', 'updated_at'
+  ).default('id'),
+  sortOrder: Joi.string().valid('ASC', 'DESC').default('ASC')
 }); 

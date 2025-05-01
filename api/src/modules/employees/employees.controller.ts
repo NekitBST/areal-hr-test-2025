@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Put, Body, Param, ParseIntPipe, UseGuards, Req, Query } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { FindAllEmployeesDto } from './dto/find-all-employees.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
-import { createEmployeeSchema, updateEmployeeSchema } from './validation/employee.schema';
+import { createEmployeeSchema, updateEmployeeSchema, findAllEmployeesSchema } from './validation/employee.schema';
 import { DatabaseService } from '../../common/services/database.service';
 import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -21,8 +22,11 @@ export class EmployeesController {
   ) {}
 
   @Get()
-  async findAll() {
-    return this.employeesService.findAll();
+  async findAll(
+    @Query(new JoiValidationPipe(findAllEmployeesSchema))
+    query: FindAllEmployeesDto,
+  ) {
+    return this.employeesService.findAll(query);
   }
 
   @Get(':id')

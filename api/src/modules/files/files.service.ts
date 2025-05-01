@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
+import { FindAllFilesDto } from './dto/find-all-files.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
@@ -11,10 +12,14 @@ import { Request } from 'express';
 export class FilesService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(query: FindAllFilesDto = {}) {
+    const sortField = query.sortField || 'id';
+    const sortOrder = query.sortOrder || 'ASC';
+
     const result = await this.dbService.query(
       'SELECT id, name, file_path, employee_id, created_at, updated_at ' +
-      'FROM files WHERE deleted_at IS NULL ORDER BY id'
+      'FROM files WHERE deleted_at IS NULL ' +
+      `ORDER BY ${sortField} ${sortOrder}`
     );
 
     return result.rows;

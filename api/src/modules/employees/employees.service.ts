@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { FindAllEmployeesDto } from './dto/find-all-employees.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
@@ -11,7 +12,25 @@ import { Request } from 'express';
 export class EmployeesService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(query: FindAllEmployeesDto = {}) {
+    const sortField = query.sortField || 'id';
+    const sortOrder = query.sortOrder || 'ASC';
+
+    const sortFieldMap = {
+      id: 'e.id',
+      last_name: 'e.last_name',
+      first_name: 'e.first_name',
+      middle_name: 'e.middle_name',
+      date_of_birth: 'e.date_of_birth',
+      department_name: 'd.name',
+      position_name: 'p.name',
+      salary: 'ho.salary',
+      created_at: 'e.created_at',
+      updated_at: 'e.updated_at'
+    };
+
+    const mappedSortField = sortFieldMap[sortField] || 'e.id';
+
     const result = await this.dbService.query(
       'SELECT e.id, e.last_name, e.first_name, e.middle_name, e.date_of_birth, ' +
       'e.passport_series, e.passport_number, e.passport_issue_date, e.passport_department_code, ' +
@@ -29,7 +48,7 @@ export class EmployeesService {
       'LEFT JOIN departments d ON d.id = ho.department_id ' +
       'LEFT JOIN positions p ON p.id = ho.position_id ' +
       'WHERE e.deleted_at IS NULL ' +
-      'ORDER BY e.id'
+      `ORDER BY ${mappedSortField} ${sortOrder}`
     );
 
     return result.rows;

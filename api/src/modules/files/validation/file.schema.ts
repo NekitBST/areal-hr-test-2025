@@ -43,3 +43,10 @@ export const updateFileSchema = Joi.object({
       'object.min': 'Необходимо указать хотя бы одно поле для обновления'
     })
 });
+
+export const findAllFilesSchema = Joi.object({
+  sortField: Joi.string().valid(
+    'id', 'name', 'employee_id', 'created_at', 'updated_at'
+  ).default('id'),
+  sortOrder: Joi.string().valid('ASC', 'DESC').default('ASC')
+});

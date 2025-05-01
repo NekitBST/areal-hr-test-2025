@@ -23,6 +23,7 @@
       @view="viewDetails"
       @edit="openEditDialog"
       @delete="confirmDelete"
+      @sort="handleSort"
     />
 
     <EmployeeForm
@@ -98,10 +99,19 @@ const formErrors = reactive({
   registration_apartment: ''
 })
 
+const sortField = ref('id')
+const sortOrder = ref('ASC')
+
 const employees = computed(() => store.employees)
 const loading = computed(() => store.loading)
 const detailsDialogVisible = ref(false)
 const employeeDetails = computed(() => store.employeeDetails)
+
+const handleSort = (event) => {
+  sortField.value = event.sortField
+  sortOrder.value = event.sortOrder === 1 ? 'ASC' : 'DESC'
+  store.fetchEmployees({ sortField: sortField.value, sortOrder: sortOrder.value })
+}
 
 const openCreateDialog = () => {
   dialogMode.value = 'create'
@@ -290,6 +300,6 @@ const saveFile = async (formData) => {
 }
 
 onMounted(async () => {
-  await store.fetchEmployees()
+  await store.fetchEmployees({ sortField: sortField.value, sortOrder: sortOrder.value })
 })
 </script>

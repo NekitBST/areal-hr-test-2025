@@ -14,10 +14,10 @@ export const useFilesStore = defineStore('files', {
       this.selectedFile = file
     },
 
-    async fetchFiles() {
+    async fetchFiles(params = {}) {
       this.loading = true
       try {
-        const response = await filesApi.getAll()
+        const response = await filesApi.getAll(params)
         this.files = response.data
       } catch (error) {
         throw error
