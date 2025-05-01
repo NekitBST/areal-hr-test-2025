@@ -10,10 +10,10 @@ export const useUsersStore = defineStore('users', {
   }),
 
   actions: {
-    async fetchUsers() {
+    async fetchUsers(params = {}) {
       this.loading = true
       try {
-        const response = await usersApi.getAll()
+        const response = await usersApi.getAll(params)
         this.users = response.data
       } catch (error) {
         throw error

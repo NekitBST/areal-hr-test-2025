@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { DatabaseService } from '../../common/services/database.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { buildUpdateQuery } from '../../utils/db-update.utils';
 import { LogChanges } from '../../decorators/log-changes.decorator';
 import { PoolClient } from 'pg';
@@ -12,14 +13,19 @@ import { Request } from 'express';
 export class UsersService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  async findAll() {
+  async findAll(params: FindAllUsersDto = {}) {
+    const sortField = params.sortField || 'id';
+    const sortOrder = params.sortOrder || 'ASC';
+
+    const fieldPrefix = sortField === 'role_name' ? 'r.' : 'u.';
+
     const result = await this.dbService.query(
       'SELECT u.id, u.last_name, u.first_name, u.middle_name, u.login, ' +
       'u.created_at, u.updated_at, u.role_id, r.name as role_name ' +
       'FROM users u ' +
       'JOIN roles r ON u.role_id = r.id ' +
       'WHERE u.deleted_at IS NULL ' +
-      'ORDER BY u.id'
+      `ORDER BY ${fieldPrefix}${sortField === 'role_name' ? 'name' : sortField} ${sortOrder}`
     );
 
     return result.rows;

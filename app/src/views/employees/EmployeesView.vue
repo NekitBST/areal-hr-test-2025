@@ -205,6 +205,7 @@ const saveEmployee = async (formData) => {
       showSuccess('Сотрудник создан')
     } else {
       await store.updateEmployee(selectedEmployee.value.id, formData)
+      await store.fetchEmployees()
       showSuccess('Сотрудник обновлен')
     }
     closeDialog()

@@ -17,6 +17,7 @@
       @view="viewDetails"
       @edit="openEditDialog"
       @delete="confirmDelete"
+      @sort="handleSort"
     />
 
     <UserForm
@@ -65,6 +66,9 @@ const formErrors = reactive({
   password: '',
   role_id: ''
 })
+
+const sortField = ref('id')
+const sortOrder = ref('ASC')
 
 const users = computed(() => store.users)
 const loading = computed(() => store.loading)
@@ -197,7 +201,13 @@ const viewDetails = async (user) => {
   }
 }
 
+const handleSort = (event) => {
+  sortField.value = event.sortField
+  sortOrder.value = event.sortOrder === 1 ? 'ASC' : 'DESC'
+  store.fetchUsers({ sortField: sortField.value, sortOrder: sortOrder.value })
+}
+
 onMounted(async () => {
-  await store.fetchUsers()
+  await store.fetchUsers({ sortField: sortField.value, sortOrder: sortOrder.value })
 })
 </script>

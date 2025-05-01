@@ -41,7 +41,7 @@ export const organizationsApi = {
 }
 
 export const usersApi = {
-  getAll: () => api.get('/users'),
+  getAll: (params = {}) => api.get('/users', { params }),
   getById: (id) => api.get(`/users/${id}`),
   create: (data) => api.post('/users', data),
   update: (id, data) => api.put(`/users/${id}`, data),

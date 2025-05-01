@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, ParseIntPipe, UseGuards, Req, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FindAllUsersDto } from './dto/find-all-users.dto';
 import { JoiValidationPipe } from '../../common/pipes/joi-validation.pipe';
-import { createUserSchema, updateUserSchema } from './validation/user.schema';
+import { createUserSchema, updateUserSchema, findAllUsersSchema } from './validation/user.schema';
 import { DatabaseService } from '../../common/services/database.service';
 import { AuthenticatedGuard } from '../auth/guards/authenticated.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
@@ -21,8 +22,11 @@ export class UsersController {
   ) {}
 
   @Get()
-  async findAll() {
-    return this.usersService.findAll();
+  async findAll(
+    @Query(new JoiValidationPipe(findAllUsersSchema))
+    params: FindAllUsersDto
+  ) {
+    return this.usersService.findAll(params);
   }
 
   @Get(':id')

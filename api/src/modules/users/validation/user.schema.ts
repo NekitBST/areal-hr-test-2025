@@ -100,4 +100,11 @@ export const updateUserSchema = Joi.object({
     .messages({
       'number.base': 'Роль не может быть пустой (выберите роль из списка или оставьте предыдущую)'
     })
+});
+
+export const findAllUsersSchema = Joi.object({
+  sortField: Joi.string().valid(
+    'id', 'last_name', 'first_name', 'login', 'role_name', 'created_at', 'updated_at'
+  ).default('id'),
+  sortOrder: Joi.string().valid('ASC', 'DESC').default('ASC')
 }); 
