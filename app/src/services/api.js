@@ -2,8 +2,13 @@ import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
 import router from '../router'
 
+const isDevelopment = import.meta.env.MODE === 'development'
+const baseURL = isDevelopment
+  ? `http://${import.meta.env.VITE_DB_HOST}:${import.meta.env.VITE_PORT}/api`
+  : '/api'
+
 const api = axios.create({
-  baseURL: `http://${import.meta.env.VITE_DB_HOST}:${import.meta.env.VITE_PORT}/api`,
+  baseURL,
   headers: {
     'Content-Type': 'application/json'
   },

@@ -44,10 +44,7 @@ services:
       context: ./app
       dockerfile: ../containers/app/Dockerfile
     ports:
-      - "5173:5173"
-    environment:
-      - VITE_DB_HOST=${VITE_DB_HOST}
-      - VITE_PORT=${VITE_PORT}
+      - "80:80"
     depends_on:
       - api
 
