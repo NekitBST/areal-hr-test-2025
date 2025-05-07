@@ -1,6 +1,8 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
+
+RUN apk add --no-cache netcat-openbsd
 
 COPY package*.json ./
 RUN npm install
@@ -10,4 +12,13 @@ RUN npm run build
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start:prod"]
+RUN printf '#!/bin/sh\n\
+echo "Waiting for PostgreSQL to be ready..."\n\
+while ! nc -z $DB_HOST $DB_PORT; do\n\
+  sleep 0.1\ndone\necho "PostgreSQL is ready!"\n\
+echo "Running database migrations..."\n\
+npm run migrate:up\n\
+echo "Starting application..."\n\
+npm run start:prod' > /app/start.sh && chmod +x /app/start.sh
+
+CMD ["/app/start.sh"]
