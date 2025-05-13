@@ -19,6 +19,17 @@
     />
 
     <UIDropdown
+      id="action"
+      v-model="formData.action"
+      :options="actions"
+      placeholder="Выберите действие"
+      label="Действие"
+      :error="errors.action"
+      :disabled="!formData.employee_id"
+      required
+    />
+
+    <UIDropdown
       v-if="showField.department"
       id="department_id"
       v-model="formData.department_id"
@@ -28,6 +39,7 @@
       placeholder="Выберите отдел"
       label="Отдел"
       :error="errors.department_id"
+      :disabled="!formData.employee_id || !formData.action"
       required
     />
 
@@ -41,16 +53,7 @@
       placeholder="Выберите должность"
       label="Должность"
       :error="errors.position_id"
-      required
-    />
-
-    <UIDropdown
-      id="action"
-      v-model="formData.action"
-      :options="actions"
-      placeholder="Выберите действие"
-      label="Действие"
-      :error="errors.action"
+      :disabled="!formData.employee_id || !formData.action"
       required
     />
 
@@ -61,6 +64,7 @@
       type="number"
       label="Зарплата"
       :error="errors.salary"
+      :disabled="!formData.employee_id || !formData.action"
       min="0"
     />
 
