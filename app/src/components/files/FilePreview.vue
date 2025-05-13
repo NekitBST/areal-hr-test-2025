@@ -58,7 +58,12 @@ const props = defineProps({
 
 const fileUrl = computed(() => {
   if (!props.filePath) return null
-  return `http://${import.meta.env.VITE_DB_HOST}:${import.meta.env.VITE_PORT}/${props.filePath}`
+  const isDevelopment = import.meta.env.MODE === 'development'
+  const baseURL = isDevelopment
+    ? `http://${import.meta.env.VITE_DB_HOST}:${import.meta.env.VITE_PORT}`
+    : ''
+  const path = props.filePath.startsWith('/') ? props.filePath.slice(1) : props.filePath
+  return `${baseURL}/${path}`
 })
 
 const isImage = computed(() => {
