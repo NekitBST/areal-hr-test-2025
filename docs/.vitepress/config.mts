@@ -3,6 +3,8 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Документация Areal HR",
   description: "Документация HR-системы для управления персоналом",
+  base: '/docs/',
+  ignoreDeadLinks: true,
   themeConfig: {
     nav: [
       { text: 'Главная', link: '/' },

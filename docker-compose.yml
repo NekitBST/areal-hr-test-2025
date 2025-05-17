@@ -10,6 +10,14 @@ services:
     depends_on:
       - app
       - api
+      - docs
+
+  docs:
+    build:
+      context: .
+      dockerfile: containers/docs/Dockerfile
+    expose:
+      - "80"
 
   postgres:
     image: postgres:17-alpine
